@@ -1,85 +1,112 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Gig Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Este projeto contém a aplicação backend para o Projeto Aplicado gig construída com NestJS e um banco de dados PostgreSQL, ambos rodando em containers Docker.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Integrantes do Grupo
+- Matheus Cavalcante
+- Arthur Diógenes
+- Paulo Luan
+- Maria Juliane
 
-## Description
+## Pré-requisitos
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/)
 
-## Project setup
+## Primeiros Passos
+
+### Clone o repositório
 
 ```bash
-$ npm install
+git clone https://github.com/ArthurDiogenes/gig-back.git
+cd gig-back
 ```
 
-## Compile and run the project
+### Configuração do Ambiente
+
+Crie um arquivo `.env` no diretório raiz com o seguinte conteúdo:
+
+```
+# Descrição: Variáveis de ambiente para a aplicação
+DB_HOST=db
+DB_PORT=5432
+DB_USER=root
+DB_PASSWORD=root
+DB_NAME=gig
+JWT_SECRET=secret_jwt
+URL_FRONTEND=http://localhost:3000
+```
+
+### Inicie a aplicação
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+docker-compose up -d
 ```
 
-## Run tests
+Este comando irá:
+- Construir e iniciar o serviço de backend NestJS
+- Iniciar o serviço de banco de dados PostgreSQL
+- Configurar a rede entre os serviços
+
+A API backend estará disponível em: `http://localhost:5500`
+
+## Estrutura do Projeto
+
+```
+├── docker-compose.yml     # Configuração do Docker Compose
+├── Dockerfile             # Configuração Docker para o backend
+├── .env                   # Variáveis de ambiente
+├── src/                   # Código fonte da aplicação NestJS
+├── ...
+```
+
+## Serviços
+
+### Backend (NestJS)
+
+O serviço de backend é uma aplicação NestJS que fornece a API para o frontend. Ele se conecta ao banco de dados PostgreSQL usando as credenciais definidas no arquivo `.env`.
+
+### Banco de Dados (PostgreSQL)
+
+O banco de dados PostgreSQL armazena todos os dados da aplicação. O banco de dados é inicializado com as configurações especificadas no arquivo `.env`.
+
+## Desenvolvimento
+
+### Visualizar logs
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+docker-compose logs -f
 ```
 
-## Resources
+### Reconstruir containers
 
-Check out a few resources that may come in handy when working with NestJS:
+Se você fizer alterações no código ou no Dockerfile:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+docker-compose up -d --build
+```
 
-## Support
+### Parar containers
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+docker-compose down
+```
 
-## Stay in touch
+Para remover volumes também:
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+docker-compose down -v
+```
 
-## License
+## Documentação da API
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Uma vez que a aplicação esteja rodando, você pode acessar a documentação da API Swagger em:
+
+```
+http://localhost:5500/api
+```
+
+## Solução de Problemas
+
+- **Problemas de conexão com o banco de dados**: Certifique-se de que o arquivo `.env` possui a configuração correta e que o container do banco de dados está rodando.
+- **Problemas de inicialização do container**: Verifique os logs usando `docker-compose logs -f` para ver quaisquer erros durante a inicialização.
