@@ -6,9 +6,10 @@ import { dataSourceOptions } from './data-source';
 import { UsersService } from './users/users.service';
 import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(dataSourceOptions), UsersModule],
+  imports: [TypeOrmModule.forRoot(dataSourceOptions), UsersModule, AuthModule],
   controllers: [AppController, UsersController],
   providers: [AppService, UsersService],
 })

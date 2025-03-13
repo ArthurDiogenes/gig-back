@@ -13,6 +13,11 @@ export class UsersService {
     private readonly userRepository: Repository<User>,
   ) {}
 
+  async getUserByEmail(email: string) {
+    this.logger.log(`Getting user with email: ${email}`);
+    return this.userRepository.findOne({ where: { email } });
+  }
+
   async createUser(body: CreateUserDto) {
     this.logger.log(`Creating user with email: ${body.email}`);
     const salt = bcryptjs.genSaltSync(10);
