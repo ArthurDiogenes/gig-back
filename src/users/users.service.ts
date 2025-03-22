@@ -19,6 +19,13 @@ export class UsersService {
   }
 
   async createUser(body: CreateUserDto) {
+    const existingUser = await this.getUserByEmail(body.email);
+    if (existingUser) {
+      this.logger.log(`User already exists with email: ${body.email}`);
+      return {
+        message: 'User already exists with this email',
+      };
+    }
     this.logger.log(`Creating user with email: ${body.email}`);
     const salt = bcryptjs.genSaltSync(10);
     const password = bcryptjs.hashSync(body.password, salt);
