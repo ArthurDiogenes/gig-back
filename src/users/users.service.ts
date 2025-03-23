@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { ConflictException, Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -22,16 +22,17 @@ export class UsersService {
     const existingUser = await this.getUserByEmail(body.email);
     if (existingUser) {
       this.logger.log(`User already exists with email: ${body.email}`);
-      return res.status(409).json({
-        message: 'User already exists with this email',
-      });
+      throw new ConflictException('Email já cadastrado');
     }
     this.logger.log(`Creating user with email: ${body.email}`);
     const salt = bcryptjs.genSaltSync(10);
     const password = bcryptjs.hashSync(body.password, salt);
-    return await this.userRepository.save({
+    await this.userRepository.save({
       ...body,
       password,
+    });
+    return res.status(201).send({
+      message: 'Usuário criado com sucesso',
     });
   }
 }
