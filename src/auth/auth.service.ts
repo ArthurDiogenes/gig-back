@@ -77,8 +77,8 @@ export class AuthService {
       message: 'User logged in successfully',
       user: {
         id: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
+        email: user.email,
+        role: user.role,
       },
       accessToken: token.accessToken,
     });
