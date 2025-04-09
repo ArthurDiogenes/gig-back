@@ -36,8 +36,16 @@ export class UsersService {
       ...body,
       password,
     });
-    return res.status(201).send({
-      message: 'Usuário criado com sucesso',
-    });
+
+    if(body.role == 'band'){
+      return res.status(201).send({
+        message: 'Banda cadastrada com sucesso',
+      });
+    }else{
+      return res.status(201).send({
+        message: 'Estabelecimento cadastrado com sucesso',
+      });
+    }
+    
   }
 }
