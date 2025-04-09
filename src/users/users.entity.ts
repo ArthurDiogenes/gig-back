@@ -12,16 +12,13 @@ export class User {
   id: string;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
-  firstName: string;
-
-  @Column({ type: 'varchar', length: 255, nullable: false })
-  lastName: string;
-
-  @Column({ type: 'varchar', length: 255, nullable: false })
   email: string;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
   password: string;
+
+  @Column({ type: 'varchar', length: 255, nullable: false })
+  role: 'band' | 'venue' | 'admin';
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
