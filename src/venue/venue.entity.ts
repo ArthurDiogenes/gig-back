@@ -24,7 +24,7 @@ export class Venue {
   @Column({ type: 'varchar', length: 255, nullable: true })
   city: string;
 
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'text', nullable: true })
   description: string;
 
   @Column({ type: 'varchar', length: 255, nullable: true })
