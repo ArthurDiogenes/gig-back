@@ -11,7 +11,7 @@ import { VenueService } from './venue.service';
 import { CreateVenueDto } from './dto/create-venue.dto';
 import { UpdateVenueDto } from './dto/update-venue.dto';
 
-@Controller('venue')
+@Controller('venues')
 export class VenueController {
   constructor(private readonly venueService: VenueService) {}
 
