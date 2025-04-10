@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, Logger } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -19,6 +19,11 @@ export class UsersService {
   }
 
   async createUser(body: CreateUserDto, res: Response) {
+    if(!body.email || !body.password || !body.role) {
+      this.logger.log('Campos obrigatórios não preenchidos');
+      throw new BadRequestException('Campos obrigatórios não preenchidos. Campos: email, password e role');
+    }
+
     const existingUser = await this.getUserByEmail(body.email);
     if (existingUser) {
       this.logger.log(`User already exists with email: ${body.email}`);
@@ -31,8 +36,16 @@ export class UsersService {
       ...body,
       password,
     });
-    return res.status(201).send({
-      message: 'Usuário criado com sucesso',
-    });
+
+    if(body.role == 'band'){
+      return res.status(201).send({
+        message: 'Banda cadastrada com sucesso',
+      });
+    }else{
+      return res.status(201).send({
+        message: 'Estabelecimento cadastrado com sucesso',
+      });
+    }
+    
   }
 }
