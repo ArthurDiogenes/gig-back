@@ -4,6 +4,7 @@ import { UpdateVenueDto } from './dto/update-venue.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Venue } from './venue.entity';
 import { Repository } from 'typeorm';
+import { Response } from 'express';
 
 @Injectable()
 export class VenueService {
@@ -13,9 +14,11 @@ export class VenueService {
     private readonly venueRepository: Repository<Venue>,
   ) {}
 
-  async create(createVenueDto: CreateVenueDto) {
-    console.log(createVenueDto);
-    return 'This action adds a new venue';
+  async create(createVenueDto: CreateVenueDto, res: Response) {
+    this.logger.log(createVenueDto);
+    return res.status(201).send({
+      message: 'Estabelecimento cadastrado com sucesso',
+    });
   }
 
   async findAll() {

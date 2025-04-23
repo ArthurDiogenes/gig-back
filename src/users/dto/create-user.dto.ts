@@ -12,4 +12,24 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsIn(['band', 'venue', 'admin'])
   role: 'band' | 'venue' | 'admin';
+
+  @IsNotEmpty()
+  @IsString()
+  venue: string;
+
+  @IsNotEmpty()
+  @IsString()
+  tipo: string;
+
+  @IsNotEmpty()
+  @IsString()
+  cep: string;
+
+  @IsNotEmpty()
+  @IsString()
+  city: string;
+
+  @IsNotEmpty()
+  @IsString()
+  address: string;
 }

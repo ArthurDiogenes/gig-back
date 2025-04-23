@@ -5,12 +5,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcryptjs from 'bcryptjs';
 import { Response } from 'express';
+import { VenueService } from 'src/venue/venue.service';
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly venueService: VenueService,
   ) {}
 
   async getUserByEmail(email: string) {
@@ -19,6 +21,7 @@ export class UsersService {
   }
 
   async createUser(body: CreateUserDto, res: Response) {
+    this.logger.log(body);
     if(!body.email || !body.password || !body.role) {
       this.logger.log('Campos obrigatórios não preenchidos');
       throw new BadRequestException('Campos obrigatórios não preenchidos. Campos: email, password e role');
@@ -33,17 +36,23 @@ export class UsersService {
     const salt = bcryptjs.genSaltSync(10);
     const password = bcryptjs.hashSync(body.password, salt);
     await this.userRepository.save({
-      ...body,
+      email: body.email,
       password,
+      role: body.role,
     });
 
-    if(body.role == 'band'){
-      return res.status(201).send({
-        message: 'Banda cadastrada com sucesso',
-      });
+    if(body.role == 'venue'){
+      const venueBody = {
+        venue: body.venue,
+        type: body.tipo,
+        cep: body.cep,
+        city: body.city,
+        address: body.address,
+      }
+      return await this.venueService.create(venueBody, res);
     }else{
       return res.status(201).send({
-        message: 'Estabelecimento cadastrado com sucesso',
+        message: 'Banda cadastrada com sucesso',
       });
     }
     
