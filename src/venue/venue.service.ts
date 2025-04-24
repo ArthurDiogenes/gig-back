@@ -1,4 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateVenueDto } from './dto/create-venue.dto';
 import { UpdateVenueDto } from './dto/update-venue.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -19,9 +24,17 @@ export class VenueService {
 
   async create(createVenueDto: CreateVenueDto, res: Response) {
     this.logger.log(createVenueDto);
-    return res.status(201).send({
-      message: 'Estabelecimento cadastrado com sucesso',
-    });
+    try {
+      await this.venueRepository.save(createVenueDto);
+      return res.status(201).send({
+        message: 'Estabelecimento cadastrado com sucesso',
+      });
+    } catch (error) {
+      this.logger.error('Erro ao cadastrar o estabelecimento', error.stack);
+      throw new InternalServerErrorException(
+        'Erro ao cadastrar o estabelecimento',
+      );
+    }
   }
 
   async findAll() {
