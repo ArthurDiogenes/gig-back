@@ -1,24 +1,23 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateVenueDto {
-    @IsNotEmpty()
-    @IsString()
-    venue: string;
+  @IsNotEmpty()
+  @IsString()
+  name: string;
 
-    @IsNotEmpty()
-    @IsString()
-    type: string;
+  @IsNotEmpty()
+  @IsString()
+  type: string;
 
-    @IsNotEmpty()
-    @IsString()
-    cep: string;
+  @IsNotEmpty()
+  @IsString()
+  cep: string;
 
-    @IsNotEmpty()
-    @IsString()
-    city: string;
+  @IsNotEmpty()
+  @IsString()
+  city: string;
 
-    @IsNotEmpty()
-    @IsString()
-    address: string;
-
+  @IsNotEmpty()
+  @IsString()
+  address: string;
 }

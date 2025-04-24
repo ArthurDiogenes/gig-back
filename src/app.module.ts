@@ -8,9 +8,10 @@ import { UsersController } from './users/users.controller';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { VenueModule } from './venue/venue.module';
+import { BandsModule } from './bands/bands.module';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(dataSourceOptions), UsersModule, AuthModule, VenueModule],
+  imports: [TypeOrmModule.forRoot(dataSourceOptions), UsersModule, AuthModule, VenueModule, BandsModule],
   controllers: [AppController, UsersController],
   providers: [AppService, UsersService],
 })
