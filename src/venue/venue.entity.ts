@@ -9,8 +9,8 @@ import {
 
 @Entity({ name: 'venues' })
 export class Venue {
-  @PrimaryGeneratedColumn('increment')
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ type: 'varchar', length: 255, nullable: false })
   name: string;
@@ -32,6 +32,15 @@ export class Venue {
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   contact: string;
+
+  @Column({ nullable: true })
+  coverPhoto: string;
+
+  @Column({ nullable: true })
+  profilePhoto: string;
+
+  @Column('simple-json', { nullable: true })
+  socialMedia?: { [key: string]: string }; // Ex: { instagram: 'url', facebook: 'url' }
 
   @OneToOne(() => User)
   @JoinColumn({ name: 'user_id' })
