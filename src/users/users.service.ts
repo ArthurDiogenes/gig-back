@@ -1,4 +1,9 @@
-import { BadRequestException, ConflictException, Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -22,9 +27,11 @@ export class UsersService {
 
   async createUser(body: CreateUserDto, res: Response) {
     this.logger.log(body);
-    if(!body.email || !body.password || !body.role) {
+    if (!body.email || !body.password || !body.role) {
       this.logger.log('Campos obrigatórios não preenchidos');
-      throw new BadRequestException('Campos obrigatórios não preenchidos. Campos: email, password e role');
+      throw new BadRequestException(
+        'Campos obrigatórios não preenchidos. Campos: email, password e role',
+      );
     }
 
     const existingUser = await this.getUserByEmail(body.email);
@@ -35,26 +42,26 @@ export class UsersService {
     this.logger.log(`Creating user with email: ${body.email}`);
     const salt = bcryptjs.genSaltSync(10);
     const password = bcryptjs.hashSync(body.password, salt);
-    await this.userRepository.save({
+    const user = await this.userRepository.save({
       email: body.email,
       password,
       role: body.role,
     });
+    this.logger.log(`User created with id: ${user.id}`);
 
-    if(body.role == 'venue'){
+    if (body.role == 'venue') {
       const venueBody = {
-        venue: body.venue,
+        name: body.venue,
         type: body.tipo,
         cep: body.cep,
         city: body.city,
         address: body.address,
-      }
+      };
       return await this.venueService.create(venueBody, res);
-    }else{
+    } else {
       return res.status(201).send({
         message: 'Banda cadastrada com sucesso',
       });
     }
-    
   }
 }
