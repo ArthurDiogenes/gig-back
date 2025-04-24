@@ -7,6 +7,7 @@ import { UsersModule } from 'src/users/users.module';
 import { UsersService } from 'src/users/users.service';
 import { JwtStrategy } from './jwt.strategy';
 import { VenueModule } from 'src/venue/venue.module';
+import { BandsModule } from 'src/bands/bands.module';
 
 @Module({
   imports: [
@@ -16,7 +17,8 @@ import { VenueModule } from 'src/venue/venue.module';
       signOptions: { expiresIn: '1d' },
     }),
     UsersModule,
-    VenueModule
+    VenueModule,
+    BandsModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, UsersService, JwtService, JwtStrategy],

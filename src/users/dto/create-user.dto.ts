@@ -32,4 +32,12 @@ export class CreateUserDto {
   @IsNotEmpty()
   @IsString()
   address: string;
+
+  @IsNotEmpty()
+  @IsString()
+  bandName: string;
+
+  @IsNotEmpty()
+  @IsString()
+  genero: string;
 }

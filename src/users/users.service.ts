@@ -11,6 +11,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import * as bcryptjs from 'bcryptjs';
 import { Response } from 'express';
 import { VenueService } from 'src/venue/venue.service';
+import { BandsService } from 'src/bands/bands.service';
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
@@ -18,6 +19,7 @@ export class UsersService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly venueService: VenueService,
+    private readonly bandService: BandsService,
   ) {}
 
   async getUserByEmail(email: string) {
@@ -59,9 +61,12 @@ export class UsersService {
       };
       return await this.venueService.create(venueBody, res);
     } else {
-      return res.status(201).send({
-        message: 'Banda cadastrada com sucesso',
-      });
+      const bandBody = {
+        bandName: body.bandName,
+        city: body.city,
+        genero: body.genero,
+      };
+      return await this.bandService.create(bandBody, res);
     }
   }
 }
