@@ -1,4 +1,10 @@
-import { IsEmail, IsIn, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsIn,
+  IsNotEmpty,
+  IsString,
+  ValidateIf,
+} from 'class-validator';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -13,31 +19,41 @@ export class CreateUserDto {
   @IsIn(['band', 'venue', 'admin'])
   role: 'band' | 'venue' | 'admin';
 
-  @IsNotEmpty()
+  // Campos obrigatórios apenas para role = venue
+  @ValidateIf((o) => o.role === 'venue')
   @IsString()
+  @IsNotEmpty()
   venue: string;
 
-  @IsNotEmpty()
+  @ValidateIf((o) => o.role === 'venue')
   @IsString()
+  @IsNotEmpty()
   tipo: string;
 
-  @IsNotEmpty()
+  @ValidateIf((o) => o.role === 'venue')
   @IsString()
+  @IsNotEmpty()
   cep: string;
 
-  @IsNotEmpty()
+  @ValidateIf((o) => o.role === 'venue')
   @IsString()
-  city: string;
-
   @IsNotEmpty()
-  @IsString()
   address: string;
 
-  @IsNotEmpty()
+  // Campos obrigatórios para band e venue
+  @ValidateIf((o) => o.role === 'venue' || o.role === 'band')
   @IsString()
+  @IsNotEmpty()
+  city: string;
+
+  // Campos obrigatórios apenas para role = band
+  @ValidateIf((o) => o.role === 'band')
+  @IsString()
+  @IsNotEmpty()
   bandName: string;
 
-  @IsNotEmpty()
+  @ValidateIf((o) => o.role === 'band')
   @IsString()
+  @IsNotEmpty()
   genero: string;
 }

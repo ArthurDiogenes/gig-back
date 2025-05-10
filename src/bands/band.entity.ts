@@ -1,8 +1,10 @@
+import { Post } from 'src/posts/post.entity';
 import { User } from 'src/users/users.entity';
 import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -26,6 +28,9 @@ export class Band {
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   contact: string;
+
+  @OneToMany(() => Post, (post) => post.author)
+  posts: Post[];
 
   @OneToOne(() => User)
   @JoinColumn({ name: 'user_id' })

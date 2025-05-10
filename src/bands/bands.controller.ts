@@ -10,15 +10,14 @@ import {
 import { BandsService } from './bands.service';
 import { CreateBandDto } from './dto/create-band.dto';
 import { UpdateBandDto } from './dto/update-band.dto';
-import { Response } from 'express';
 
 @Controller('bands')
 export class BandsController {
   constructor(private readonly bandsService: BandsService) {}
 
   @Post()
-  create(@Body() createBandDto: CreateBandDto, res: Response) {
-    return this.bandsService.create(createBandDto, res);
+  create(@Body() createBandDto: CreateBandDto) {
+    return this.bandsService.create(createBandDto);
   }
 
   @Get()
