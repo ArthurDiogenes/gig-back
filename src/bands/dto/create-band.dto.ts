@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateBandDto {
   @IsNotEmpty()
@@ -9,4 +9,8 @@ export class CreateBandDto {
 
   @IsNotEmpty()
   genero: string;
+
+  @IsNotEmpty()
+  @IsString()
+  userId: string;
 }
