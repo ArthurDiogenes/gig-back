@@ -10,6 +10,7 @@ import { AuthModule } from './auth/auth.module';
 import { VenueModule } from './venue/venue.module';
 import { BandsModule } from './bands/bands.module';
 import { PostsModule } from './posts/posts.module';
+import { ContractModule } from './contract/contract.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { PostsModule } from './posts/posts.module';
     VenueModule,
     BandsModule,
     PostsModule,
+    ContractModule,
   ],
   controllers: [AppController, UsersController],
   providers: [AppService, UsersService],
