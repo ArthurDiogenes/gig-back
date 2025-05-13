@@ -1,3 +1,4 @@
+import { Contract } from 'src/contract/contract.entity';
 import { Post } from 'src/posts/post.entity';
 import { User } from 'src/users/users.entity';
 import {
@@ -31,6 +32,9 @@ export class Band {
 
   @OneToMany(() => Post, (post) => post.author)
   posts: Post[];
+
+  @OneToMany(() => Contract, (contract) => contract.provider)
+  receivedContracts: Contract[];
 
   @OneToOne(() => User)
   @JoinColumn({ name: 'user_id' })

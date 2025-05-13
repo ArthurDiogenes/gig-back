@@ -1,8 +1,10 @@
+import { Contract } from 'src/contract/contract.entity';
 import { User } from 'src/users/users.entity';
 import {
   Column,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -41,6 +43,9 @@ export class Venue {
 
   @Column('simple-json', { nullable: true })
   socialMedia?: { [key: string]: string }; // Ex: { instagram: 'url', facebook: 'url' }
+
+  @OneToMany(() => Contract, (contract) => contract.requester)
+  requestedContracts: Contract[];
 
   @OneToOne(() => User)
   @JoinColumn({ name: 'user_id' })
