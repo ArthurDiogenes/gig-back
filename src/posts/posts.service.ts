@@ -12,14 +12,24 @@ export class PostsService {
   constructor(
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
+    
+    @InjectRepository(Band)
+    private readonly bandRepository: Repository<Band>,
   ) {}
 
   async createPost(postData: CreatePostDto) {
     const { content, author } = postData;
 
+    const band = await this.bandRepository.findOne({
+      where: { id: author },
+    });
+    if (!band) {
+      throw new NotFoundException('Band not found');
+    }
+
     const post = this.postRepository.create({
       content,
-      author: { id: author } as Band,
+      author: band,
     });
 
     return await this.postRepository.save(post);
