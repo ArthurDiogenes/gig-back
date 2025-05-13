@@ -26,8 +26,8 @@ export class BandsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.bandsService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.bandsService.findOne(id);
   }
 
   @Patch(':id')
