@@ -1,0 +1,97 @@
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Post } from './post.entity';
+import { Repository } from 'typeorm';
+import { CreatePostDto } from './dto/create-post.dto';
+import { Band } from 'src/bands/band.entity';
+
+@Injectable()
+export class PostsService {
+  private readonly logger = new Logger(PostsService.name);
+
+  constructor(
+    @InjectRepository(Post)
+    private readonly postRepository: Repository<Post>,
+  ) {}
+
+  async createPost(postData: CreatePostDto) {
+    const { content, author } = postData;
+
+    const post = this.postRepository.create({
+      content,
+      author: { id: author } as Band,
+    });
+
+    return await this.postRepository.save(post);
+  }
+
+  async getPosts() {
+    return await this.postRepository.find({
+      relations: ['author'],
+    });
+  }
+
+  async getPostById(id: number) {
+    const post = await this.postRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    return post;
+  }
+
+  async getPostByAuthor(authorId: number) {
+    const post = await this.postRepository.findOne({
+      where: { author: { id: authorId } },
+      relations: ['author'],
+    });
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+    return post;
+  }
+
+  async likePost(id: number) {
+    const post = await this.postRepository.findOne({
+      where: { id },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    post.likes += 1;
+
+    return await this.postRepository.save(post);
+  }
+
+  async unlikePost(id: number) {
+    const post = await this.postRepository.findOne({
+      where: { id },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    post.likes -= 1;
+
+    return await this.postRepository.save(post);
+  }
+
+  async deletePost(id: number) {
+    const post = await this.postRepository.findOne({
+      where: { id },
+    });
+
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
+
+    return await this.postRepository.remove(post);
+  }
+}

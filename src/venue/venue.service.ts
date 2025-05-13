@@ -2,14 +2,12 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
-  NotFoundException,
 } from '@nestjs/common';
 import { CreateVenueDto } from './dto/create-venue.dto';
 import { UpdateVenueDto } from './dto/update-venue.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Venue } from './venue.entity';
 import { Repository } from 'typeorm';
-import { Response } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as uuid from 'uuid';
@@ -22,13 +20,10 @@ export class VenueService {
     private readonly venueRepository: Repository<Venue>,
   ) {}
 
-  async create(createVenueDto: CreateVenueDto, res: Response) {
+  async create(createVenueDto: CreateVenueDto) {
     this.logger.log(createVenueDto);
     try {
-      await this.venueRepository.save(createVenueDto);
-      return res.status(201).send({
-        message: 'Estabelecimento cadastrado com sucesso',
-      });
+      return await this.venueRepository.save(createVenueDto);
     } catch (error) {
       this.logger.error('Erro ao cadastrar o estabelecimento', error.stack);
       throw new InternalServerErrorException(

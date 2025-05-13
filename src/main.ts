@@ -4,6 +4,8 @@ import * as dotenv from 'dotenv';
 import * as cookieParser from 'cookie-parser';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { ValidationPipe } from '@nestjs/common';
+import { ValidationExceptionFilter } from './filters/validation-exception.filter';
 dotenv.config();
 
 async function bootstrap() {
@@ -31,6 +33,9 @@ async function bootstrap() {
     exposedHeaders: ['Set-Cookie'],
     credentials: true,
   });
+
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+  app.useGlobalFilters(new ValidationExceptionFilter());
 
   await app.listen(process.env.PORT || 5500);
 }

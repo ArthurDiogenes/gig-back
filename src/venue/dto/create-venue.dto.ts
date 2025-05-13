@@ -20,4 +20,8 @@ export class CreateVenueDto {
   @IsNotEmpty()
   @IsString()
   address: string;
+
+  @IsNotEmpty()
+  @IsString()
+  userId: string;
 }

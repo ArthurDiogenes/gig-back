@@ -1,11 +1,11 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CreateBandDto } from './dto/create-band.dto';
 import { UpdateBandDto } from './dto/update-band.dto';
-import { Response } from 'express';
 import { Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Band } from './band.entity';
 import { Repository } from 'typeorm';
+import { User } from 'src/users/users.entity';
 
 @Injectable()
 export class BandsService {
@@ -15,14 +15,14 @@ export class BandsService {
     private readonly bandRepository: Repository<Band>,
   ) {}
 
-  async create(CreateBandDto: CreateBandDto, res: Response) {
+  async create(CreateBandDto: CreateBandDto) {
     this.logger.log(CreateBandDto);
     try {
-      const band = await this.bandRepository.save(CreateBandDto);
-      this.logger.log(`Band created with id: ${band.id}`);
-      return res.status(201).send({
-        message: 'Banda cadastrada com sucesso',
+      const band = this.bandRepository.create({
+        ...CreateBandDto,
+        userId: { id: CreateBandDto.userId } as User,
       });
+      return await this.bandRepository.save(band);
     } catch (error) {
       this.logger.error('Erro ao cadastrar banda', error.stack);
       throw new InternalServerErrorException('Erro ao cadastrar banda');
