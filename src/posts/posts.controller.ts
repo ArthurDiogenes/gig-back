@@ -30,9 +30,14 @@ export class PostsController {
     return await this.postsService.getPostById(+id);
   }
 
-  @Get('band/:authorId')
-  async getPostByAuthor(@Param('authorId') authorId: number) {
-    return await this.postsService.getPostByAuthor(+authorId);
+  @Get('band/:bandId')
+  async getPostsByBand(@Param('bandId') bandId: number) {
+    return await this.postsService.getPostsByBand(+bandId);
+  }
+
+  @Get('band/:bandId/:id')
+  async getPostByBand(@Param('bandId') bandId: number, @Param('id') id: number) {
+    return await this.postsService.getPostByBand(+bandId, +id);
   }
 
   @Patch('like/:id')
