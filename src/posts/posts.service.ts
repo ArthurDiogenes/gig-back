@@ -65,9 +65,6 @@ export class PostsService {
       where: { author: { id: bandId } },
       relations: ['author'],
     });
-    if (posts.length === 0) {
-      throw new NotFoundException('Band not has any posts');
-    }
     return posts;
   }
 

@@ -49,4 +49,99 @@ export class ContractService {
     this.logger.log(`Contract created: ${contract.id}`);
     return contract;
   }
+
+  async getContracts() {
+    return await this.contractRepository.find({
+      relations: ['requester', 'provider'],
+    });
+  }
+
+  async getContractById(id: string) {
+    const contract = await this.contractRepository.findOne({
+      where: { id },
+      relations: ['requester', 'provider'],
+    });
+    if (!contract) {
+      throw new NotFoundException(`Contract with ID ${id} not found`);
+    }
+    return contract;
+  }
+
+  async getContractsByBand(bandId: number) {
+    const band = await this.bandRepository.findOne({
+      where: { id: bandId }
+    });
+
+    if (!band) {
+      throw new NotFoundException(`Band with ID ${bandId} not found`);
+    }
+
+    const contracts = await this.contractRepository.find({
+      where: { provider: { id: bandId } },
+      relations: ['requester'],
+    });
+
+    return contracts;
+  }
+
+  async getContractsByVenue(venueId: string) {
+    const venue = await this.venueRepository.findOne({
+      where: { id: venueId }
+    });
+
+    if (!venue) {
+      throw new NotFoundException(`Venue with ID ${venueId} not found`);
+    }
+
+    const contracts = await this.contractRepository.find({
+      where: { requester: { id: venueId } },
+      relations: ['provider'],
+    });
+
+    return contracts;
+  }
+
+  async confirmContract(id: string) {
+    const contract = await this.contractRepository.findOne({
+      where: { id },
+      relations: ['requester', 'provider'],
+    });
+
+    if (!contract) {
+      throw new NotFoundException(`Contract with ID ${id} not found`);
+    }
+
+    contract.isConfirmed = true;
+    await this.contractRepository.save(contract);
+
+    this.logger.log(`Contract confirmed: ${contract.id}`);
+    return contract;
+  }
+
+  async cancelContract(id: string) {
+    const contract = await this.contractRepository.findOne({
+      where: { id },
+      relations: ['requester', 'provider'],
+    });
+
+    if (!contract) {
+      throw new NotFoundException(`Contract with ID ${id} not found`);
+    }
+
+    contract.isConfirmed = false;
+    await this.contractRepository.save(contract);
+
+    this.logger.log(`Contract cancelled: ${contract.id}`);
+    return contract;
+  }
+
+  async deleteContract(id: string) {
+    const contract = await this.contractRepository.findOne({
+      where:{id},
+    })
+    if (!contract) {
+      throw new NotFoundException(`Contract with ID ${id} not found`);
+    }
+    await this.contractRepository.delete(id);
+}
 }
