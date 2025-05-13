@@ -12,14 +12,24 @@ export class PostsService {
   constructor(
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
+    
+    @InjectRepository(Band)
+    private readonly bandRepository: Repository<Band>,
   ) {}
 
   async createPost(postData: CreatePostDto) {
     const { content, author } = postData;
 
+    const band = await this.bandRepository.findOne({
+      where: { id: author },
+    });
+    if (!band) {
+      throw new NotFoundException('Band not found');
+    }
+
     const post = this.postRepository.create({
       content,
-      author: { id: author } as Band,
+      author: band,
     });
 
     return await this.postRepository.save(post);
@@ -44,15 +54,41 @@ export class PostsService {
     return post;
   }
 
-  async getPostByAuthor(authorId: number) {
-    const post = await this.postRepository.findOne({
-      where: { author: { id: authorId } },
+  async getPostsByBand(bandId: number) {
+    const band = await this.bandRepository.findOne({
+      where: { id: bandId },
+    });
+    if (!band) {
+      throw new NotFoundException('Band not found');
+    }
+    const posts = await this.postRepository.find({
+      where: { author: { id: bandId } },
       relations: ['author'],
     });
+    if (posts.length === 0) {
+      throw new NotFoundException('Band not has any posts');
+    }
+    return posts;
+  }
+
+  async getPostByBand(bandId: number, id: number){
+    const band = await this.bandRepository.findOne({
+      where: { id: bandId },
+    });
+    if (!band) {
+      throw new NotFoundException('Band not found');
+    }
+    const post = await this.postRepository.findOne({
+      where: { id, author: { id: bandId } },
+      relations: ['author'],
+    });
+
     if (!post) {
       throw new NotFoundException('Post not found');
     }
+
     return post;
+
   }
 
   async likePost(id: number) {
