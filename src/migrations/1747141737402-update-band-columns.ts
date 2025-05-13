@@ -4,9 +4,8 @@ export class UpdateBandColumns1747141737402 implements MigrationInterface {
   name = 'UpdateBandColumns1747141737402';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE "bands" DROP COLUMN "genero"`);
     await queryRunner.query(
-      `ALTER TABLE "bands" ADD "genre" character varying(255) NOT NULL`,
+      `ALTER TABLE "bands" RENAME COLUMN "genero" TO "genre"`,
     );
     await queryRunner.query(
       `ALTER TABLE "bands" ADD "created_at" TIMESTAMP NOT NULL DEFAULT now()`,
