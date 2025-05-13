@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateBandDto } from './dto/create-band.dto';
 import { UpdateBandDto } from './dto/update-band.dto';
 import { Logger } from '@nestjs/common';
@@ -34,7 +38,13 @@ export class BandsService {
   }
 
   async findOne(id: number) {
-    return `This action returns a #${id} band`;
+    const band = await this.bandRepository.findOne({
+      where: { id },
+    });
+    if (!band) {
+      throw new NotFoundException('Banda não encontrada');
+    }
+    return band;
   }
 
   async update(id: number, updateBandDto: UpdateBandDto) {

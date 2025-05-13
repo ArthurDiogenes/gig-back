@@ -53,7 +53,7 @@ export class UsersService {
     if (role === 'band') {
       return this.bandService.create({
         bandName: body.bandName,
-        genero: body.genero,
+        genre: body.genre,
         city: body.city,
         userId: user.id,
       });

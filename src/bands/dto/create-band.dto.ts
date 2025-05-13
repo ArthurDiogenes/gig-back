@@ -8,7 +8,7 @@ export class CreateBandDto {
   city: string;
 
   @IsNotEmpty()
-  genero: string;
+  genre: string;
 
   @IsNotEmpty()
   @IsString()

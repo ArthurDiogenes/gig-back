@@ -55,5 +55,5 @@ export class CreateUserDto {
   @ValidateIf((o) => o.role === 'band')
   @IsString()
   @IsNotEmpty()
-  genero: string;
+  genre: string;
 }
