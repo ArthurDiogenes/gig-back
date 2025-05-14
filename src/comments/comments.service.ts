@@ -38,7 +38,6 @@ export class CommentsService {
             this.logger.error(`User not found: ${userId}`);
             throw new BadRequestException('User not found');
         }
-
         delete user.password;
 
         const comment = this.commentRepository.create({
@@ -48,6 +47,61 @@ export class CommentsService {
         });
 
         return await this.commentRepository.save(comment);
+    }
+
+    async getCommentById(id: number) {
+        const comment = await this.commentRepository.findOne({
+            where: { id },
+            relations: ['user', 'post'],
+        });
+        delete comment.user.password;
+
+        if (!comment) {
+            this.logger.error(`Comment not found: ${id}`);
+            throw new BadRequestException('Comment not found');
+        }
+
+        return comment;
+    }
+
+    async getCommentsByPostId(id: number) {
+        const post = await this.postRepository.findOne({
+            where: { id },
+        });
+        if (!post) {
+            this.logger.error(`Post not found: ${id}`);
+            throw new BadRequestException('Post not found');
+        }
+        const comments = await this.commentRepository.find({
+            where: { post: { id } },
+            relations: ['user', 'post'],
+            select: {
+                user: {
+                    password: false,
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true,
+                },
+        }});
+
+        if (!comments) {
+            this.logger.error(`Comments not found for post: ${id}`);
+            throw new BadRequestException('Comments not found');
+        }
+        return comments;
+    }
+
+    async deleteComment(id: number) {
+        const comment = await this.commentRepository.findOne({
+            where: { id },
+        });
+        if (!comment) {
+            this.logger.error(`Comment not found: ${id}`);
+            throw new BadRequestException('Comment not found');
+        }
+
+        return await this.commentRepository.delete({ id });
     }
 
 }
