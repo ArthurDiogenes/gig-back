@@ -19,16 +19,14 @@ export class CreateUserDto {
   @IsIn(['band', 'venue', 'admin'])
   role: 'band' | 'venue' | 'admin';
 
-  // Campos obrigatórios apenas para role = venue
-  @ValidateIf((o) => o.role === 'venue')
-  @IsString()
   @IsNotEmpty()
-  venue: string;
+  @IsString()
+  name: string;
 
   @ValidateIf((o) => o.role === 'venue')
   @IsString()
   @IsNotEmpty()
-  tipo: string;
+  type: string;
 
   @ValidateIf((o) => o.role === 'venue')
   @IsString()
@@ -40,17 +38,11 @@ export class CreateUserDto {
   @IsNotEmpty()
   address: string;
 
-  // Campos obrigatórios para band e venue
-  @ValidateIf((o) => o.role === 'venue' || o.role === 'band')
   @IsString()
   @IsNotEmpty()
   city: string;
 
   // Campos obrigatórios apenas para role = band
-  @ValidateIf((o) => o.role === 'band')
-  @IsString()
-  @IsNotEmpty()
-  bandName: string;
 
   @ValidateIf((o) => o.role === 'band')
   @IsString()
