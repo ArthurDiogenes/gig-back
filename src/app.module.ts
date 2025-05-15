@@ -11,6 +11,7 @@ import { VenueModule } from './venue/venue.module';
 import { BandsModule } from './bands/bands.module';
 import { PostsModule } from './posts/posts.module';
 import { ContractModule } from './contract/contract.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { ContractModule } from './contract/contract.module';
     BandsModule,
     PostsModule,
     ContractModule,
+    CommentsModule,
   ],
   controllers: [AppController, UsersController],
   providers: [AppService, UsersService],

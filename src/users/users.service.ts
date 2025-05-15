@@ -22,7 +22,7 @@ export class UsersService {
   }
 
   async createUser(body: CreateUserDto) {
-    const { email, password, role } = body;
+    const { email, password, role, name } = body;
 
     const existingUser = await this.getUserByEmail(email);
     if (existingUser) {
@@ -33,6 +33,7 @@ export class UsersService {
     const hashedPassword = await bcryptjs.hash(password, 10);
     const user = await this.userRepository.save({
       email,
+      name,
       password: hashedPassword,
       role,
     });
@@ -41,8 +42,8 @@ export class UsersService {
 
     if (role === 'venue') {
       return this.venueService.create({
-        name: body.venue,
-        type: body.tipo,
+        name: body.name,
+        type: body.type,
         cep: body.cep,
         city: body.city,
         address: body.address,
@@ -52,7 +53,7 @@ export class UsersService {
 
     if (role === 'band') {
       return this.bandService.create({
-        bandName: body.bandName,
+        bandName: body.name,
         genre: body.genre,
         city: body.city,
         userId: user.id,
