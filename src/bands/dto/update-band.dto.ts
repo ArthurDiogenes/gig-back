@@ -1,4 +1,15 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateBandDto } from './create-band.dto';
+import { IsNotEmpty } from 'class-validator';
 
-export class UpdateBandDto extends PartialType(CreateBandDto) {}
+export class UpdateBandDto {
+  @IsNotEmpty()
+  bandName: string;
+
+  @IsNotEmpty()
+  genre: string;
+
+  @IsNotEmpty()
+  city: string;
+
+  @IsNotEmpty()
+  description: string;
+}
