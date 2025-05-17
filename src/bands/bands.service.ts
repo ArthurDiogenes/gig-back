@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -49,6 +50,21 @@ export class BandsService {
 
   async update(id: number, updateBandDto: UpdateBandDto) {
     return `This action updates a #${id} band ${updateBandDto}`;
+  }
+
+  async updateBand(id: number, updateBandDto: UpdateBandDto) {
+    const band = await this.bandRepository.findOne({
+      where: { id },
+    });
+
+    if (!band) {
+      throw new BadRequestException('Banda não encontrada');
+    }
+
+    console.log('updateBandDto', updateBandDto);
+
+    await this.bandRepository.update(id, updateBandDto);
+    return { message: 'Banda atualizada com sucesso' };
   }
 
   async remove(id: number) {

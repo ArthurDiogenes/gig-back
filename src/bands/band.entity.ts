@@ -33,6 +33,9 @@ export class Band {
   @Column({ type: 'varchar', length: 255, nullable: true })
   contact: string;
 
+  @Column({ type: 'int2', nullable: true })
+  members: number;
+
   @OneToMany(() => Post, (post) => post.author)
   posts: Post[];
 
