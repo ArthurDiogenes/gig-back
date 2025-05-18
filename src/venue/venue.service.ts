@@ -23,7 +23,10 @@ export class VenueService {
   async create(createVenueDto: CreateVenueDto) {
     this.logger.log(createVenueDto);
     try {
-      return await this.venueRepository.save(createVenueDto);
+      await this.venueRepository.save(createVenueDto);
+      return {
+        message: 'Estabelecimento cadastrado com sucesso',
+      };
     } catch (error) {
       this.logger.error('Erro ao cadastrar o estabelecimento', error.stack);
       throw new InternalServerErrorException(
