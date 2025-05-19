@@ -9,7 +9,7 @@ import { UpdateBandDto } from './dto/update-band.dto';
 import { Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Band } from './band.entity';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { User } from 'src/users/users.entity';
 
 @Injectable()
@@ -49,6 +49,30 @@ export class BandsService {
       throw new NotFoundException('Banda não encontrada');
     }
     return band;
+  }
+
+  async search(name: string, page = 1, limit = 10) {
+    if (!name) return [];
+
+    const skip = (page - 1) * limit;
+
+    const [results, total] = await this.bandRepository.findAndCount({
+      where: [
+        { bandName: ILike(`%${name}%`) },
+        { city: ILike(`%${name}%`) },
+        { genre: ILike(`%${name}%`) },
+      ],
+      take: limit,
+      skip,
+      order: { bandName: 'ASC' },
+    });
+
+    return {
+      data: results,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+    };
   }
 
   async update(id: number, updateBandDto: UpdateBandDto) {
