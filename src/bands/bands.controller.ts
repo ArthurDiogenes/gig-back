@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   Put,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { BandsService } from './bands.service';
 import { CreateBandDto } from './dto/create-band.dto';
@@ -26,8 +28,17 @@ export class BandsController {
     return this.bandsService.findAll();
   }
 
+  @Get('pesquisa')
+  search(
+    @Query('name') name?: string,
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+  ) {
+    return this.bandsService.search(name, +page, +limit);
+  }
+
   @Get(':id')
-  findOne(@Param('id') id: number) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.bandsService.findOne(id);
   }
 
