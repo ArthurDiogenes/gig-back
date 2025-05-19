@@ -46,7 +46,7 @@ export class BandsService {
       where: { id },
     });
     if (!band) {
-      throw new NotFoundException('Banda não encontrada');
+      throw new BadRequestException('Banda não encontrada');
     }
     return band;
   }

@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './post.entity';
 import { Repository } from 'typeorm';
@@ -24,7 +24,7 @@ export class PostsService {
       where: { id: author },
     });
     if (!band) {
-      throw new NotFoundException('Band not found');
+      throw new BadRequestException('Band not found');
     }
 
     const post = this.postRepository.create({
@@ -35,10 +35,22 @@ export class PostsService {
     return await this.postRepository.save(post);
   }
 
-  async getPosts() {
-    return await this.postRepository.find({
+  async getPosts(page = 1, limit = 10, orderBy = 'createdAt') {
+    const skip = (page - 1) * limit;
+    const take = limit;
+    const order = orderBy === 'createdAt' ? 'DESC' : 'ASC';
+    const [posts, total] = await this.postRepository.findAndCount({
+      skip,
+      take,
+      order: { [orderBy]: order },
       relations: ['author'],
     });
+    return {
+      posts,
+      total,
+      page,
+      limit,
+    };
   }
 
   async getPostById(id: number) {
@@ -48,24 +60,35 @@ export class PostsService {
     });
 
     if (!post) {
-      throw new NotFoundException('Post not found');
+      throw new BadRequestException('Post not found');
     }
 
     return post;
   }
 
-  async getPostsByBand(bandId: number) {
+  async getPostsByBand(bandId: number, page = 1, limit = 10, orderBy = 'createdAt') {
+    const skip = (page - 1) * limit;
+    const take = limit;
+    const order = orderBy === 'createdAt' ? 'DESC' : 'ASC';
     const band = await this.bandRepository.findOne({
       where: { id: bandId },
     });
     if (!band) {
-      throw new NotFoundException('Band not found');
+      throw new BadRequestException('Band not found');
     }
-    const posts = await this.postRepository.find({
+    const [posts, total] = await this.postRepository.findAndCount({
       where: { author: { id: bandId } },
+      skip,
+      take,
+      order: { [orderBy]: order },
       relations: ['author'],
     });
-    return posts;
+    return {
+      posts,
+      total,
+      page,
+      limit,
+    };
   }
 
   async getPostByBand(bandId: number, id: number){
@@ -73,7 +96,7 @@ export class PostsService {
       where: { id: bandId },
     });
     if (!band) {
-      throw new NotFoundException('Band not found');
+      throw new BadRequestException('Band not found');
     }
     const post = await this.postRepository.findOne({
       where: { id, author: { id: bandId } },
@@ -81,7 +104,7 @@ export class PostsService {
     });
 
     if (!post) {
-      throw new NotFoundException('Post not found');
+      throw new BadRequestException('Post not found');
     }
 
     return post;
@@ -94,7 +117,7 @@ export class PostsService {
     });
 
     if (!post) {
-      throw new NotFoundException('Post not found');
+      throw new BadRequestException('Post not found');
     }
 
     post.likes += 1;
@@ -108,7 +131,7 @@ export class PostsService {
     });
 
     if (!post) {
-      throw new NotFoundException('Post not found');
+      throw new BadRequestException('Post not found');
     }
 
     post.likes -= 1;
@@ -122,7 +145,7 @@ export class PostsService {
     });
 
     if (!post) {
-      throw new NotFoundException('Post not found');
+      throw new BadRequestException('Post not found');
     }
 
     return await this.postRepository.remove(post);
