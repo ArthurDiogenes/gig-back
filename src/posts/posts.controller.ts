@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -21,8 +22,12 @@ export class PostsController {
   }
 
   @Get()
-  async getPosts() {
-    return await this.postsService.getPosts();
+  async getPosts(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+    @Query('orderBy') orderBy: string = 'createdAt',
+  ) {
+    return await this.postsService.getPosts(+page, +limit, orderBy);
   }
 
   @Get(':id')
@@ -31,8 +36,13 @@ export class PostsController {
   }
 
   @Get('band/:bandId')
-  async getPostsByBand(@Param('bandId') bandId: number) {
-    return await this.postsService.getPostsByBand(+bandId);
+  async getPostsByBand(
+    @Param('bandId') bandId: number,
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+    @Query('orderBy') orderBy: string = 'createdAt',
+  ) {
+    return await this.postsService.getPostsByBand(+bandId, +page, +limit, orderBy);
   }
 
   @Get('band/:bandId/:id')

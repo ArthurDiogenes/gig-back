@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Contract } from './contract.entity';
@@ -26,14 +26,14 @@ export class ContractService {
 
     const requester = await this.venueRepository.findOneBy({ id: requesterId });
     if (!requester) {
-      throw new NotFoundException(
+      throw new BadRequestException(
         `Venue (requester) with ID ${requesterId} not found`,
       );
     }
 
     const provider = await this.bandRepository.findOneBy({ id: providerId });
     if (!provider) {
-      throw new NotFoundException(
+      throw new BadRequestException(
         `Band (provider) with ID ${providerId} not found`,
       );
     }
@@ -62,7 +62,7 @@ export class ContractService {
       relations: ['requester', 'provider'],
     });
     if (!contract) {
-      throw new NotFoundException(`Contract with ID ${id} not found`);
+      throw new BadRequestException(`Contract with ID ${id} not found`);
     }
     return contract;
   }
@@ -73,7 +73,7 @@ export class ContractService {
     });
 
     if (!band) {
-      throw new NotFoundException(`Band with ID ${bandId} not found`);
+      throw new BadRequestException(`Band with ID ${bandId} not found`);
     }
 
     const contracts = await this.contractRepository.find({
@@ -90,7 +90,7 @@ export class ContractService {
     });
 
     if (!venue) {
-      throw new NotFoundException(`Venue with ID ${venueId} not found`);
+      throw new BadRequestException(`Venue with ID ${venueId} not found`);
     }
 
     const contracts = await this.contractRepository.find({
@@ -108,7 +108,7 @@ export class ContractService {
     });
 
     if (!contract) {
-      throw new NotFoundException(`Contract with ID ${id} not found`);
+      throw new BadRequestException(`Contract with ID ${id} not found`);
     }
 
     contract.isConfirmed = true;
@@ -125,7 +125,7 @@ export class ContractService {
     });
 
     if (!contract) {
-      throw new NotFoundException(`Contract with ID ${id} not found`);
+      throw new BadRequestException(`Contract with ID ${id} not found`);
     }
 
     contract.isConfirmed = false;
@@ -140,7 +140,7 @@ export class ContractService {
       where:{id},
     })
     if (!contract) {
-      throw new NotFoundException(`Contract with ID ${id} not found`);
+      throw new BadRequestException(`Contract with ID ${id} not found`);
     }
     await this.contractRepository.delete(id);
 }

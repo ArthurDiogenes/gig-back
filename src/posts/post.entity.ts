@@ -24,6 +24,9 @@ export class Post {
   @Column({ type: 'int', nullable: false, default: 0 })
   likes: number;
 
+  @Column({ type: 'int', nullable: false, default: 0 })
+  comments_count: number;
+
   @ManyToOne(() => Band, (band) => band.posts, { onDelete: 'CASCADE' })
   author: Band;
 
