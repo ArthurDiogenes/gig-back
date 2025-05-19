@@ -27,7 +27,10 @@ export class BandsService {
         ...CreateBandDto,
         userId: { id: CreateBandDto.userId } as User,
       });
-      return await this.bandRepository.save(band);
+      await this.bandRepository.save(band);
+      return {
+        message: 'Banda cadastrada com sucesso',
+      };
     } catch (error) {
       this.logger.error('Erro ao cadastrar banda', error.stack);
       throw new InternalServerErrorException('Erro ao cadastrar banda');
