@@ -5,6 +5,7 @@ export class CreatePostDto {
   @IsNotEmpty({ message: 'Content is required.' })
   content: string;
 
+  @IsString({ message: 'Author must be a string.' })
   @IsNotEmpty({ message: 'Author is required.' })
   author: number;
 }
