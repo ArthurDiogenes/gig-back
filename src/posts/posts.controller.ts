@@ -8,17 +8,42 @@ import {
   Patch,
   Post,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
-  async createPost(@Body() postData: CreatePostDto) {
-    return await this.postsService.createPost(postData);
+  @UseInterceptors(
+    FileInterceptor('image', {
+      limits: {
+        fileSize: 5 * 1024 * 1024, // 5 MB
+      },
+      fileFilter: (
+        _: any,
+        file: { mimetype: string },
+        cb: (arg0: Error, arg1: boolean) => void,
+      ) => {
+        const allowedMimeTypes = ['image/jpg', 'image/jpeg', 'image/png'];
+        if (allowedMimeTypes.includes(file.mimetype)) {
+          cb(null, true);
+        } else {
+          cb(new Error('Invalid file type'), false);
+        }
+      },
+    }),
+  )
+  async createPost(
+    @Body() postData: CreatePostDto,
+    @UploadedFile() image?: Express.Multer.File,
+  ) {
+    return await this.postsService.createPost(postData, image);
   }
 
   @Get()
@@ -46,7 +71,10 @@ export class PostsController {
   }
 
   @Get('band/:bandId/:id')
-  async getPostByBand(@Param('bandId') bandId: number, @Param('id') id: number) {
+  async getPostByBand(
+    @Param('bandId') bandId: number,
+    @Param('id') id: number,
+  ) {
     return await this.postsService.getPostByBand(+bandId, +id);
   }
 
