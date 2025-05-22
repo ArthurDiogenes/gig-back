@@ -12,6 +12,7 @@ import { BandsModule } from './bands/bands.module';
 import { PostsModule } from './posts/posts.module';
 import { ContractModule } from './contract/contract.module';
 import { CommentsModule } from './comments/comments.module';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { CommentsModule } from './comments/comments.module';
     PostsModule,
     ContractModule,
     CommentsModule,
+    ReviewsModule,
   ],
   controllers: [AppController, UsersController],
   providers: [AppService, UsersService],
