@@ -1,5 +1,6 @@
 import { Contract } from 'src/contract/contract.entity';
 import { Post } from 'src/posts/post.entity';
+import { Review } from 'src/reviews/review.entity';
 import { User } from 'src/users/users.entity';
 import {
   Column,
@@ -41,6 +42,9 @@ export class Band {
 
   @OneToMany(() => Contract, (contract) => contract.provider)
   receivedContracts: Contract[];
+
+  @OneToMany(() => Review, (review) => review.band)
+  reviews: Review[];
 
   @CreateDateColumn()
   createdAt: Date;
