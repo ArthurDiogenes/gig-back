@@ -19,13 +19,13 @@ export class Post {
   content: string;
 
   @Column({ nullable: true })
-  image_file: string;
+  imageFile: string;
 
   @Column({ type: 'int', nullable: false, default: 0 })
   likes: number;
 
   @Column({ type: 'int', nullable: false, default: 0 })
-  comments_count: number;
+  commentsCount: number;
 
   @ManyToOne(() => Band, (band) => band.posts, { onDelete: 'CASCADE' })
   author: Band;

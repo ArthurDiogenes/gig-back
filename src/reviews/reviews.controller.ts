@@ -4,10 +4,10 @@ import { CreateReviewDto } from './dto/create-reviews.dto';
 
 @Controller('reviews')
 export class ReviewsController {
-  constructor(private readonly reviewsService: ReviewsService) {}
+  constructor(private readonly reviewsService: ReviewsService) { }
 
   @Post()
   async createReview(@Body() body: CreateReviewDto) {
-    return await this.reviewsService.createReview(body);
+    return { message: 'Serviço de criar reviews' };
   }
 }
