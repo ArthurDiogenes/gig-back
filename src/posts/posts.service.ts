@@ -34,38 +34,53 @@ export class PostsService {
   async createPost(postData: CreatePostDto, image?: Express.Multer.File) {
     this.logger.log(`Creating new post...`);
 
-    const { content, author } = postData;
-    let image_path = null;
+    const { content, authorId } = postData;
+
+    const band = await this.bandRepository.findOne({
+      where: {
+        userId: { id: authorId },
+      },
+      relations: ['userId'],
+    });
+
+    let imagePath = null;
+
     if (image) {
-      this.logger.log(`Image recieved, processing upload...`);
+      this.logger.log(`Image received, processing upload...`);
       const extension = mime.extension(image.mimetype);
-      const path_name = `/posts/${uuidv4()}.${extension}`;
+      const pathName = `/posts/${uuidv4()}.${extension}`;
 
       const { error } = await this.supabase.storage
         .from('gig')
-        .upload(path_name, image.buffer, {
+        .upload(pathName, image.buffer, {
           contentType: image.mimetype,
           upsert: true,
         });
+
       if (error) {
         this.logger.error(`Error uploading image: ${error.message}`);
         throw new InternalServerErrorException('Error uploading image');
       }
+
       this.logger.log(`Image uploaded successfully.`);
-      image_path = path_name;
+      imagePath = pathName;
     } else {
       this.logger.log(`No image provided, skipping upload...`);
     }
 
     this.logger.log(`Creating post...`);
-    const post = this.postRepository.save({
+
+    const newPost = await this.postRepository.create({
       content,
-      authorId: author,
+      author: band,
       likes: 0,
-      imageFile: image_path,
+      imageFile: imagePath,
     });
 
+    const post = await this.postRepository.save(newPost);
+
     this.logger.log(`Post created successfully.`);
+
     return post;
   }
 
@@ -79,8 +94,27 @@ export class PostsService {
       order: { [orderBy]: order },
       relations: ['author'],
     });
+
+    // Mapeia os posts para adicionar a signedUrl se houver imagem
+    const postsWithSignedUrls = await Promise.all(
+      posts.map(async (post) => {
+        if (post.imageFile) {
+          const { data, error } = await this.supabase.storage
+            .from('gig')
+            .createSignedUrl(post.imageFile, 60 * 60); // 1 hora
+          this.logger.log('Signed URL gerada com sucesso');
+          delete post.imageFile;
+          if (!error && data?.signedUrl) {
+            return { ...post, imageUrl: data.signedUrl };
+          }
+        }
+
+        return { ...post, imageUrl: null };
+      }),
+    );
+
     return {
-      posts,
+      posts: postsWithSignedUrls,
       total,
       page,
       limit,

@@ -45,7 +45,7 @@ export class CommentsService {
             user,
             comment: body.comment,
         });
-        post.comments_count += 1;
+        post.commentsCount += 1;
         await this.postRepository.save(post);
 
         return await this.commentRepository.save(comment);
