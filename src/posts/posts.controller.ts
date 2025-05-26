@@ -57,25 +57,30 @@ export class PostsController {
 
   @Get(':id')
   async getPostById(@Param('id') id: number) {
-    return await this.postsService.getPostById(+id);
+    return await this.postsService.getPostById(id);
   }
 
-  @Get('band/:bandId')
+  @Get('band/:userId')
   async getPostsByBand(
-    @Param('bandId') bandId: number,
+    @Param('bandId') userId: string,
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
     @Query('orderBy') orderBy: string = 'createdAt',
   ) {
-    return await this.postsService.getPostsByBand(+bandId, +page, +limit, orderBy);
+    return await this.postsService.getPostsByBand(
+      userId,
+      +page,
+      +limit,
+      orderBy,
+    );
   }
 
   @Get('band/:bandId/:id')
   async getPostByBand(
-    @Param('bandId') bandId: number,
+    @Param('bandId') userId: string,
     @Param('id') id: number,
   ) {
-    return await this.postsService.getPostByBand(+bandId, +id);
+    return await this.postsService.getPostByBand(userId, +id);
   }
 
   @Patch('like/:id')

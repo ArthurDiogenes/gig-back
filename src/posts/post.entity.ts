@@ -1,5 +1,5 @@
-import { Band } from 'src/bands/band.entity';
 import { Comments } from 'src/comments/comments.entity';
+import { User } from 'src/users/users.entity';
 import {
   Column,
   CreateDateColumn,
@@ -27,8 +27,8 @@ export class Post {
   @Column({ type: 'int', nullable: false, default: 0 })
   commentsCount: number;
 
-  @ManyToOne(() => Band, (band) => band.posts, { onDelete: 'CASCADE' })
-  author: Band;
+  @ManyToOne(() => User, (user) => user.posts, { onDelete: 'CASCADE' })
+  user: User;
 
   @OneToMany(() => Comments, (comment) => comment.post, {
     cascade: true,
