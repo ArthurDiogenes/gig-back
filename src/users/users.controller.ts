@@ -5,6 +5,12 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+
+  @Get()
+  getUsers() {
+    return this.usersService.getUsers();  
+  }
+
   @Get('/email/:email')
   getUserByEmail(email: string) {
     return this.usersService.getUserByEmail(email);

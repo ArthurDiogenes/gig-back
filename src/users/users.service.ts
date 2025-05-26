@@ -16,6 +16,10 @@ export class UsersService {
     private readonly bandService: BandsService,
   ) {}
 
+  async getUsers() {
+    return this.userRepository.find();
+  }
+
   async getUserByEmail(email: string) {
     this.logger.log(`Getting user with email: ${email}`);
     return this.userRepository.findOne({ where: { email } });
