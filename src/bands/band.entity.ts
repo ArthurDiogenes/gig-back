@@ -1,5 +1,4 @@
 import { Contract } from 'src/contract/contract.entity';
-import { Post } from 'src/posts/post.entity';
 import { Review } from 'src/reviews/review.entity';
 import { User } from 'src/users/users.entity';
 import {
@@ -36,9 +35,6 @@ export class Band {
 
   @Column({ type: 'int2', nullable: true })
   members: number;
-
-  @OneToMany(() => Post, (post) => post.author)
-  posts: Post[];
 
   @OneToMany(() => Contract, (contract) => contract.provider)
   receivedContracts: Contract[];

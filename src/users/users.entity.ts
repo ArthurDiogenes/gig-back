@@ -1,4 +1,5 @@
 import { Comments } from 'src/comments/comments.entity';
+import { Post } from 'src/posts/post.entity';
 import {
   Column,
   CreateDateColumn,
@@ -24,6 +25,9 @@ export class User {
 
   @Column({ type: 'varchar', length: 255, nullable: false })
   name: string;
+
+  @OneToMany(() => Post, (post) => post.user)
+  posts: Post[];
 
   @OneToMany(() => Comments, (comment) => comment.user, {
     cascade: true,

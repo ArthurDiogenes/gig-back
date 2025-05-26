@@ -8,10 +8,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './post.entity';
 import { Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
-import { Band } from 'src/bands/band.entity';
 import * as mime from 'mime-types';
 import { v4 as uuidv4 } from 'uuid';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { User } from 'src/users/users.entity';
 
 @Injectable()
 export class PostsService {
@@ -22,8 +22,8 @@ export class PostsService {
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
 
-    @InjectRepository(Band)
-    private readonly bandRepository: Repository<Band>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {
     this.supabase = createClient(
       process.env.SUPABASE_URL,
@@ -36,11 +36,8 @@ export class PostsService {
 
     const { content, authorId } = postData;
 
-    const band = await this.bandRepository.findOne({
-      where: {
-        userId: { id: authorId },
-      },
-      relations: ['userId'],
+    const user = await this.userRepository.findOne({
+      where: { id: authorId },
     });
 
     let imagePath = null;
@@ -70,9 +67,9 @@ export class PostsService {
 
     this.logger.log(`Creating post...`);
 
-    const newPost = await this.postRepository.create({
+    const newPost = this.postRepository.create({
       content,
-      author: band,
+      user,
       likes: 0,
       imageFile: imagePath,
     });
@@ -92,7 +89,7 @@ export class PostsService {
       skip,
       take,
       order: { [orderBy]: order },
-      relations: ['author'],
+      relations: ['user'],
     });
 
     // Mapeia os posts para adicionar a signedUrl se houver imagem
@@ -108,14 +105,17 @@ export class PostsService {
             return { ...post, imageUrl: data.signedUrl };
           }
         }
-
+        delete post.imageFile;
         return { ...post, imageUrl: null };
       }),
     );
 
+    const totalPages = Math.ceil(total / limit);
+
     return {
       posts: postsWithSignedUrls,
-      total,
+      hasNextPage: page < totalPages,
+      totalPages,
       page,
       limit,
     };
@@ -135,7 +135,7 @@ export class PostsService {
   }
 
   async getPostsByBand(
-    bandId: number,
+    userId: string,
     page = 1,
     limit = 10,
     orderBy = 'createdAt',
@@ -143,18 +143,18 @@ export class PostsService {
     const skip = (page - 1) * limit;
     const take = limit;
     const order = orderBy === 'createdAt' ? 'DESC' : 'ASC';
-    const band = await this.bandRepository.findOne({
-      where: { id: bandId },
+    const band = await this.userRepository.findOne({
+      where: { id: userId },
     });
     if (!band) {
       throw new BadRequestException('Band not found');
     }
     const [posts, total] = await this.postRepository.findAndCount({
-      where: { author: { id: bandId } },
+      where: { user: { id: userId } },
       skip,
       take,
       order: { [orderBy]: order },
-      relations: ['author'],
+      relations: ['user'],
     });
     return {
       posts,
@@ -164,15 +164,17 @@ export class PostsService {
     };
   }
 
-  async getPostByBand(bandId: number, id: number) {
-    const band = await this.bandRepository.findOne({
-      where: { id: bandId },
+  async getPostByBand(userId: string, id: number) {
+    const band = await this.userRepository.findOne({
+      where: { id: userId },
     });
+
     if (!band) {
       throw new BadRequestException('Band not found');
     }
+
     const post = await this.postRepository.findOne({
-      where: { id, author: { id: bandId } },
+      where: { id, user: { id: userId } },
       relations: ['author'],
     });
 
