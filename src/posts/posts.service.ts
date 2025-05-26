@@ -124,7 +124,7 @@ export class PostsService {
   async getPostById(id: number) {
     const post = await this.postRepository.findOne({
       where: { id },
-      relations: ['author'],
+      relations: ['comments', 'comments.user'],
     });
 
     if (!post) {
