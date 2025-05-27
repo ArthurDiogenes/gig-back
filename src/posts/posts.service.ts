@@ -70,7 +70,7 @@ export class PostsService {
     const newPost = this.postRepository.create({
       content,
       user,
-      likes: 0,
+      likesCount: 0,
       imageFile: imagePath,
     });
 
@@ -194,7 +194,7 @@ export class PostsService {
       throw new BadRequestException('Post not found');
     }
 
-    post.likes += 1;
+    post.likesCount += 1;
 
     return await this.postRepository.save(post);
   }
@@ -208,7 +208,7 @@ export class PostsService {
       throw new BadRequestException('Post not found');
     }
 
-    post.likes -= 1;
+    post.likesCount -= 1;
 
     return await this.postRepository.save(post);
   }
