@@ -14,6 +14,7 @@ import { ContractModule } from './contract/contract.module';
 import { CommentsModule } from './comments/comments.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { LikesModule } from './likes/likes.module';
+import { MusicsModule } from './musics/musics.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { LikesModule } from './likes/likes.module';
     CommentsModule,
     ReviewsModule,
     LikesModule,
+    MusicsModule,
   ],
   controllers: [AppController, UsersController],
   providers: [AppService, UsersService],
