@@ -13,6 +13,7 @@ import { PostsModule } from './posts/posts.module';
 import { ContractModule } from './contract/contract.module';
 import { CommentsModule } from './comments/comments.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { LikesModule } from './likes/likes.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { ReviewsModule } from './reviews/reviews.module';
     ContractModule,
     CommentsModule,
     ReviewsModule,
+    LikesModule,
   ],
   controllers: [AppController, UsersController],
   providers: [AppService, UsersService],

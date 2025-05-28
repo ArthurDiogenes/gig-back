@@ -1,4 +1,5 @@
 import { Comments } from 'src/comments/comments.entity';
+import { Like } from 'src/likes/like.entity';
 import { User } from 'src/users/users.entity';
 import {
   Column,
@@ -22,7 +23,7 @@ export class Post {
   imageFile: string;
 
   @Column({ type: 'int', nullable: false, default: 0 })
-  likes: number;
+  likesCount: number;
 
   @Column({ type: 'int', nullable: false, default: 0 })
   commentsCount: number;
@@ -34,6 +35,11 @@ export class Post {
     cascade: true,
   })
   comments: Comments[];
+
+  @OneToMany(() => Like, (like) => like.post, {
+    cascade: true,
+  })
+  likes: Like[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
