@@ -10,8 +10,8 @@ export class CreateReviewDto {
   rating: number;
 
   @IsNotEmpty()
-  @IsString()
-  userId: string;
+  @IsNumber()
+  bandId: number;
 
   @IsNotEmpty()
   @IsString()
