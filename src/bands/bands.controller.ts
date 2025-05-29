@@ -28,6 +28,11 @@ export class BandsController {
     return this.bandsService.findAll();
   }
 
+  @Get('featured')
+  getFeaturedBands(@Query('limit') limit: string = '2') {
+    return this.bandsService.getFeaturedBands(+limit);
+  }
+
   @Get('pesquisa')
   search(
     @Query('name') name?: string,
