@@ -10,6 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Band } from './band.entity';
 import { ILike, Repository } from 'typeorm';
 import { User } from 'src/users/users.entity';
+import { Review } from 'src/reviews/review.entity';
 
 @Injectable()
 export class BandsService {
@@ -17,6 +18,9 @@ export class BandsService {
   constructor(
     @InjectRepository(Band)
     private readonly bandRepository: Repository<Band>,
+
+    @InjectRepository(Review)
+    private readonly reviewRepository: Repository<Review>,
   ) {}
 
   async create(CreateBandDto: CreateBandDto) {
@@ -48,11 +52,27 @@ export class BandsService {
         userId: {
           id: true,
           role: true,
-  }}});
+        },
+      },
+    });
     if (!band) {
       throw new BadRequestException('Banda não encontrada');
     }
     return band;
+  }
+
+  async getFeaturedBands(limit: number) {
+    return this.reviewRepository
+      .createQueryBuilder('review')
+      .innerJoin('review.band', 'band')
+      .select('band.id', 'bandId')
+      .addSelect('band.band_name', 'bandName')
+      .addSelect('AVG(review.rating)', 'averageRating')
+      .groupBy('band.id')
+      .addGroupBy('band.band_name')
+      .orderBy('AVG(review.rating)', 'DESC')
+      .limit(limit)
+      .getRawMany();
   }
 
   async search(name: string, page = 1, limit = 10) {
