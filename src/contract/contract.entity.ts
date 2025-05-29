@@ -36,8 +36,8 @@ export class Contract {
   @Column({ type: 'text', nullable: true })
   additionalDetails?: string;
 
-  @Column({ type: 'boolean', default: false })
-  isConfirmed: boolean;
+  @Column({ type: 'boolean', default: null })
+  isConfirmed: boolean ;
 
   @ManyToOne(() => Venue)
   @JoinColumn({ name: 'requester_id' })

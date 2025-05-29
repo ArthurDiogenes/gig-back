@@ -43,7 +43,12 @@ export class BandsService {
   async findOne(id: number) {
     const band = await this.bandRepository.findOne({
       where: { id },
-    });
+      relations: ['userId'],
+      select: {
+        userId: {
+          id: true,
+          role: true,
+  }}});
     if (!band) {
       throw new BadRequestException('Banda não encontrada');
     }

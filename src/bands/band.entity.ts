@@ -1,4 +1,5 @@
 import { Contract } from 'src/contract/contract.entity';
+import { Music } from 'src/musics/music.entity';
 import { Review } from 'src/reviews/review.entity';
 import { User } from 'src/users/users.entity';
 import {
@@ -41,6 +42,11 @@ export class Band {
 
   @OneToMany(() => Review, (review) => review.band)
   reviews: Review[];
+
+  @OneToMany(() => Music, (music) => music.band, {
+    cascade: true,
+  })
+  musics: Music[];
 
   @CreateDateColumn()
   createdAt: Date;
