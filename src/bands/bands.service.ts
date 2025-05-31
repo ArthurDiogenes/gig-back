@@ -41,7 +41,7 @@ export class BandsService {
   }
 
   async findAll() {
-    return `This action returns all bands`;
+    return await this.bandRepository.find();
   }
 
   async findOne(id: number) {
@@ -58,6 +58,25 @@ export class BandsService {
     if (!band) {
       throw new BadRequestException('Banda não encontrada');
     }
+    return band;
+  }
+
+  async findBandByUser(id: string) {
+    const band = await this.bandRepository.findOne({
+      where: { userId: { id: id } },
+      relations: ['userId'],
+      select: {
+        userId: {
+          id: true,
+          role: true,
+        },
+      },
+    });
+
+    if (!band) {
+      throw new BadRequestException('Banda não encontrada');
+    }
+
     return band;
   }
 

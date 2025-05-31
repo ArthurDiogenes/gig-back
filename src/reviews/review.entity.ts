@@ -1,5 +1,5 @@
 import { Band } from 'src/bands/band.entity';
-import { Venue } from 'src/venue/venue.entity';
+import { User } from 'src/users/users.entity';
 import {
   Column,
   CreateDateColumn,
@@ -14,8 +14,8 @@ export class Review {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @ManyToOne(() => Venue, (venue) => venue.reviews)
-  venue: Venue;
+  @ManyToOne(() => User, (user) => user.reviews)
+  user: User;
 
   @ManyToOne(() => Band, (band) => band.reviews)
   band: Band;

@@ -9,6 +9,7 @@ import {
   Put,
   Query,
   ParseIntPipe,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { BandsService } from './bands.service';
 import { CreateBandDto } from './dto/create-band.dto';
@@ -45,6 +46,11 @@ export class BandsController {
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.bandsService.findOne(id);
+  }
+
+  @Get('user/:id')
+  findBandByUser(@Param('id', ParseUUIDPipe) id: string) {
+    return this.bandsService.findBandByUser(id);
   }
 
   @Patch(':id')

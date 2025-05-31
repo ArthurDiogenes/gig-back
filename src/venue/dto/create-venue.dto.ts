@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString } from 'class-validator';
+import { User } from 'src/users/users.entity';
 
 export class CreateVenueDto {
   @IsNotEmpty()
@@ -23,5 +24,5 @@ export class CreateVenueDto {
 
   @IsNotEmpty()
   @IsString()
-  userId: string;
+  user: User;
 }

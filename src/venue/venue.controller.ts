@@ -8,6 +8,7 @@ import {
   Delete,
   UseInterceptors,
   UploadedFiles,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { VenueService } from './venue.service';
 import { CreateVenueDto } from './dto/create-venue.dto';
@@ -29,8 +30,13 @@ export class VenueController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.venueService.findOne(id);
+  }
+
+  @Get('user/:id')
+  findVenueByUser(@Param('id', ParseUUIDPipe) id: string) {
+    return this.venueService.findVenueByUser(id);
   }
 
   @Patch(':id')

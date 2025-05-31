@@ -51,7 +51,7 @@ export class UsersService {
         cep: body.cep,
         city: body.city,
         address: body.address,
-        userId: user.id,
+        user: user,
       });
     }
 

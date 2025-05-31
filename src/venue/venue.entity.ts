@@ -1,5 +1,4 @@
 import { Contract } from 'src/contract/contract.entity';
-import { Review } from 'src/reviews/review.entity';
 import { User } from 'src/users/users.entity';
 import {
   Column,
@@ -48,10 +47,7 @@ export class Venue {
   @OneToMany(() => Contract, (contract) => contract.requester)
   requestedContracts: Contract[];
 
-  @OneToMany(() => Review, (review) => review.band)
-  reviews: Review[];
-
   @OneToOne(() => User)
   @JoinColumn({ name: 'user_id' })
-  userId: string;
+  user: User;
 }
