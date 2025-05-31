@@ -86,9 +86,11 @@ export class BandsService {
       .innerJoin('review.band', 'band')
       .select('band.id', 'bandId')
       .addSelect('band.band_name', 'bandName')
+      .addSelect('band.user_id', 'userId')
       .addSelect('AVG(review.rating)', 'averageRating')
       .groupBy('band.id')
       .addGroupBy('band.band_name')
+      .addGroupBy('band.user_id')
       .orderBy('AVG(review.rating)', 'DESC')
       .limit(limit)
       .getRawMany();
