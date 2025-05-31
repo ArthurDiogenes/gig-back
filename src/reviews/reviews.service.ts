@@ -9,7 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-reviews.dto';
 import { Band } from 'src/bands/band.entity';
-import { Venue } from 'src/venue/venue.entity';
+import { User } from 'src/users/users.entity';
 
 @Injectable()
 export class ReviewsService {
@@ -21,21 +21,21 @@ export class ReviewsService {
     @InjectRepository(Band)
     private readonly bandRepository: Repository<Band>,
 
-    @InjectRepository(Venue)
-    private readonly venueRepository: Repository<Venue>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async createReview(body: CreateReviewDto) {
-    const { bandId, venueId, rating, comment } = body;
+    const { bandId, userId, rating, comment } = body;
     const band = await this.bandRepository.findOneBy({ id: bandId });
     if (!band) {
       this.logger.error(`Band with ID ${bandId} not found`);
       throw new BadRequestException('Band not found');
     }
-    const venue = await this.venueRepository.findOneBy({ id: venueId });
-    if (!venue) {
-      this.logger.error(`Venue with ID ${venueId} not found`);
-      throw new BadRequestException('Venue not found');
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      this.logger.error(`User with ID ${userId} not found`);
+      throw new BadRequestException('User not found');
     }
     if (rating < 1 || rating > 5) {
       this.logger.error(`Invalid rating: ${rating}. Must be between 1 and 5.`);
@@ -43,7 +43,7 @@ export class ReviewsService {
     }
     const review = this.reviewsRepository.create({
       band,
-      venue,
+      user,
       rating,
       comment,
     });

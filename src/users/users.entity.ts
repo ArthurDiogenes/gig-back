@@ -1,6 +1,7 @@
 import { Comments } from 'src/comments/comments.entity';
 import { Like } from 'src/likes/like.entity';
 import { Post } from 'src/posts/post.entity';
+import { Review } from 'src/reviews/review.entity';
 import {
   Column,
   CreateDateColumn,
@@ -39,6 +40,9 @@ export class User {
     cascade: true,
   })
   likes: Like[];
+
+  @OneToMany(() => Review, (review) => review.band)
+  reviews: Review[];
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

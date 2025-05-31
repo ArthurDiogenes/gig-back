@@ -15,5 +15,5 @@ export class CreateReviewDto {
 
   @IsNotEmpty()
   @IsString()
-  venueId: string;
+  userId: string;
 }

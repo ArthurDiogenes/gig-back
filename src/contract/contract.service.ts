@@ -69,7 +69,7 @@ export class ContractService {
 
   async getContractsByBand(bandId: number) {
     const band = await this.bandRepository.findOne({
-      where: { id: bandId }
+      where: { id: bandId },
     });
 
     if (!band) {
@@ -86,7 +86,7 @@ export class ContractService {
 
   async getContractsByVenue(venueId: string) {
     const venue = await this.venueRepository.findOne({
-      where: { id: venueId }
+      where: { id: venueId },
     });
 
     if (!venue) {
@@ -137,11 +137,11 @@ export class ContractService {
 
   async deleteContract(id: string) {
     const contract = await this.contractRepository.findOne({
-      where:{id},
-    })
+      where: { id },
+    });
     if (!contract) {
       throw new BadRequestException(`Contract with ID ${id} not found`);
     }
     await this.contractRepository.delete(id);
-}
+  }
 }

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -36,11 +37,29 @@ export class VenueService {
   }
 
   async findAll() {
-    return `This action returns all venue`;
+    return await this.venueRepository.find();
   }
 
   async findOne(id: string) {
     return `This action returns a #${id} venue`;
+  }
+
+  async findVenueByUser(id: string) {
+    this.logger.log(id);
+    const venue = await this.venueRepository.findOne({
+      where: { user: { id } },
+      relations: ['user'],
+      select: {
+        user: {
+          id: true,
+          role: true,
+        },
+      },
+    });
+    if (!venue) {
+      throw new BadRequestException('Estabelecimento não encontrado');
+    }
+    return venue;
   }
 
   async update(
