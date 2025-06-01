@@ -89,7 +89,7 @@ export class PostsService {
       skip,
       take,
       order: { [orderBy]: order },
-      relations: ['user'],
+      relations: ['user', 'likes'],
     });
 
     // Mapeia os posts para adicionar a signedUrl se houver imagem

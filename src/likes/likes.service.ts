@@ -27,6 +27,7 @@ export class LikesService {
   ) {}
 
   async likePost(userId: string, postId: number) {
+    console.log(userId);
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) {
       throw new BadRequestException('User not found');
