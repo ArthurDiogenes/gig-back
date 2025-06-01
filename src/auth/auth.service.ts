@@ -4,12 +4,17 @@ import { User } from 'src/users/users.entity';
 import { UsersService } from 'src/users/users.service';
 import * as bcryptjs from 'bcryptjs';
 import { Response } from 'express';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { TokenPayload } from './auth';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly userService: UsersService,
     private readonly jwtService: JwtService,
   ) {
@@ -36,7 +41,13 @@ export class AuthService {
 
   async generateToken(user: User) {
     this.logger.log(`Generating JWT for user with email: ${user.email}`);
-    const payload = { email: user.email, sub: user.id };
+    const payload = {
+      email: user.email,
+      sub: {
+        id: user.id,
+        role: user.role,
+      },
+    };
     return {
       accessToken: this.jwtService.sign(payload, {
         secret: process.env.JWT_SECRET,
@@ -48,6 +59,41 @@ export class AuthService {
     // Clear the access_token cookie
     res.clearCookie('access_token');
     return res.status(200).json({ message: 'User logged out successfully' });
+  }
+
+  async getSession(user: TokenPayload) {
+    this.logger.log(`Fetching session for user with ID: ${user.sub.id}`);
+
+    const session = await this.userRepository.findOne({
+      where: { id: user.sub.id },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        name: true,
+        likes: {
+          id: true,
+          post: {
+            id: true,
+          },
+        },
+      },
+      relations: ['likes', 'likes.post'],
+    });
+
+    console.log(session);
+
+    if (!session) {
+      this.logger.error(`Session not found for user ID: ${user.sub.id}`);
+      throw new UnauthorizedException('Session not found');
+    }
+
+    const { likes, ...rest } = session;
+
+    return {
+      ...rest,
+      likedPosts: likes.map((like) => like.post.id),
+    };
   }
 
   /**
@@ -71,6 +117,13 @@ export class AuthService {
 
     // Generate token
     const token = await this.generateToken(user);
+
+    res.cookie('access_token', token.accessToken, {
+      httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
+      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+      maxAge: 8 * 60 * 60 * 1000, // 8 hours in milliseconds
+      sameSite: 'strict', // Helps prevent CSRF attacks
+    });
 
     // Return the user and the access token
     return res.status(200).json({
