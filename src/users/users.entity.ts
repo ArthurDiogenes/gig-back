@@ -1,12 +1,15 @@
+import { Band } from 'src/bands/band.entity';
 import { Comments } from 'src/comments/comments.entity';
 import { Like } from 'src/likes/like.entity';
 import { Post } from 'src/posts/post.entity';
 import { Review } from 'src/reviews/review.entity';
+import { Venue } from 'src/venue/venue.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -49,4 +52,14 @@ export class User {
 
   @UpdateDateColumn({ type: 'timestamp' })
   updatedAt: Date;
+
+  @OneToOne(() => Band, (band) => band.userId, {
+    cascade: true,
+  })
+  band?: Band;
+
+  @OneToOne(() => Venue, (venue) => venue.user, {
+    cascade: true,
+  })
+  venue?: Venue;
 }
