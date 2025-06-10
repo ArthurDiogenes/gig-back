@@ -27,6 +27,15 @@ export class UpdateVenueDto {
   profilePhoto?: string;
 
   @IsOptional()
-  @IsObject()
-  socialMedia?: { [key: string]: string };
+  @IsString()
+  twitter?: string;
+
+  @IsOptional()
+  @IsString()
+  instagram?: string;
+
+  @IsOptional()
+  @IsString()
+  facebook?: string;
+
 }
