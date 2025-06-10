@@ -1,10 +1,14 @@
 // src/venues/dto/update-venue.dto.ts
-import { IsOptional, IsString, IsObject } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class UpdateVenueDto {
   @IsOptional()
   @IsString()
   name?: string;
+
+  @IsOptional()
+  @IsString()
+  type?: string;
 
   @IsOptional()
   @IsString()
@@ -16,15 +20,15 @@ export class UpdateVenueDto {
 
   @IsOptional()
   @IsString()
-  type?: string;
+  cep?: string;
 
   @IsOptional()
   @IsString()
-  coverPhoto?: string;
+  address?: string;
 
   @IsOptional()
   @IsString()
-  profilePhoto?: string;
+  contact?: string;
 
   @IsOptional()
   @IsString()
@@ -37,5 +41,4 @@ export class UpdateVenueDto {
   @IsOptional()
   @IsString()
   facebook?: string;
-
 }

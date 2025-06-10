@@ -39,15 +39,15 @@ export class VenueController {
     return this.venueService.findVenueByUser(id);
   }
 
-  @Patch(':id')
+  @Patch('user/:userId')
   @UseInterceptors(
     FileFieldsInterceptor([
       { name: 'coverPhoto', maxCount: 1 },
       { name: 'profilePhoto', maxCount: 1 },
     ]),
   )
-  async updateVenue(
-    @Param('id') id: string,
+  async update(
+    @Param('userId', ParseUUIDPipe) userId: string,
     @Body() updateVenueDto: UpdateVenueDto,
     @UploadedFiles()
     files: {
@@ -55,7 +55,7 @@ export class VenueController {
       profilePhoto?: Express.Multer.File[];
     },
   ) {
-    return this.venueService.update(id, updateVenueDto, {
+    return this.venueService.updateByUserId(userId, updateVenueDto, {
       coverPhoto: files.coverPhoto ? files.coverPhoto[0] : null,
       profilePhoto: files.profilePhoto ? files.profilePhoto[0] : null,
     });

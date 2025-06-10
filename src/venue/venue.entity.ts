@@ -41,13 +41,13 @@ export class Venue {
   @Column({ nullable: true })
   profilePhoto: string;
 
-  @Column({type: 'varchar', length: 255, nullable: true})
+  @Column({ type: 'varchar', length: 255, nullable: true })
   twitter: string;
 
-  @Column({type: 'varchar', length: 255, nullable: true})
+  @Column({ type: 'varchar', length: 255, nullable: true })
   instagram: string;
 
-  @Column({type: 'varchar', length: 255, nullable: true})
+  @Column({ type: 'varchar', length: 255, nullable: true })
   facebook: string;
 
   @OneToMany(() => Contract, (contract) => contract.requester)
