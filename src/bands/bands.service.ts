@@ -120,6 +120,33 @@ export class BandsService {
     };
   }
 
+  async getReviewsByBandId(id: string) {
+    const band = await this.bandRepository.findOne({
+      where: { userId: { id: id } },
+      relations: ['reviews'],
+    });
+    if (!band) {
+      throw new BadRequestException('Banda não encontrada');
+    }
+    const reviews = await this.reviewRepository.find({
+      where: { band: { id: band.id } },
+      relations: ['user'],
+      select: {
+        id: true,
+        rating: true,
+        comment: true,
+        createdAt: true,
+        user: {
+          id: true,
+          name: true,
+        },
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    return reviews;
+  }
+
   async update(id: number, updateBandDto: UpdateBandDto) {
     return `This action updates a #${id} band ${updateBandDto}`;
   }
