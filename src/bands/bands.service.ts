@@ -81,44 +81,63 @@ export class BandsService {
   }
 
   async getFeaturedBands(limit: number) {
-    return this.reviewRepository
-      .createQueryBuilder('review')
-      .innerJoin('review.band', 'band')
-      .select('band.id', 'bandId')
-      .addSelect('band.band_name', 'bandName')
-      .addSelect('band.user_id', 'userId')
-      .addSelect('AVG(review.rating)', 'averageRating')
-      .groupBy('band.id')
-      .addGroupBy('band.band_name')
-      .addGroupBy('band.user_id')
-      .orderBy('AVG(review.rating)', 'DESC')
-      .limit(limit)
-      .getRawMany();
-  }
+  const results = await this.reviewRepository
+    .createQueryBuilder('review')
+    .innerJoin('review.band', 'band')
+    .innerJoin('band.userId', 'user') // Join with the user to get userId
+    .select('band.id', 'bandId')
+    .addSelect('band.band_name', 'bandName')
+    .addSelect('user.id', 'userId') // Select the userId for routing
+    .addSelect('AVG(review.rating)', 'averageRating')
+    .groupBy('band.id')
+    .addGroupBy('band.band_name')
+    .addGroupBy('user.id')
+    .orderBy('AVG(review.rating)', 'DESC')
+    .limit(limit)
+    .getRawMany();
+
+  return results;
+}
 
   async search(name: string, page = 1, limit = 10) {
-    if (!name) return [];
+  if (!name) return [];
 
-    const skip = (page - 1) * limit;
+  const skip = (page - 1) * limit;
 
-    const [results, total] = await this.bandRepository.findAndCount({
-      where: [
-        { bandName: ILike(`%${name}%`) },
-        { city: ILike(`%${name}%`) },
-        { genre: ILike(`%${name}%`) },
-      ],
-      take: limit,
-      skip,
-      order: { bandName: 'ASC' },
-    });
+  const [results, total] = await this.bandRepository.findAndCount({
+    where: [
+      { bandName: ILike(`%${name}%`) },
+      { city: ILike(`%${name}%`) },
+      { genre: ILike(`%${name}%`) },
+    ],
+    relations: ['userId'], // Include the userId relation
+    select: {
+      id: true,
+      bandName: true,
+      city: true,
+      genre: true,
+      description: true,
+      contact: true,
+      members: true,
+      createdAt: true,
+      updatedAt: true,
+      userId: {
+        id: true,
+        role: true,
+      },
+    },
+    take: limit,
+    skip,
+    order: { bandName: 'ASC' },
+  });
 
-    return {
-      data: results,
-      total,
-      page,
-      lastPage: Math.ceil(total / limit),
-    };
-  }
+  return {
+    data: results,
+    total,
+    page,
+    lastPage: Math.ceil(total / limit),
+  };
+}
 
   async getReviewsByBandId(id: string) {
     const band = await this.bandRepository.findOne({
