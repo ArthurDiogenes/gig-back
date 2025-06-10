@@ -43,6 +43,11 @@ export class BandsController {
     return this.bandsService.search(name, +page, +limit);
   }
 
+  @Get(':id/reviews')
+  getReviewsByBandId(@Param('id', ParseUUIDPipe) id: string) {
+    return this.bandsService.getReviewsByBandId(id);
+  }
+
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.bandsService.findOne(id);
