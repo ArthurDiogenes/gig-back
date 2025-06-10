@@ -15,10 +15,14 @@ import { CommentsModule } from './comments/comments.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { LikesModule } from './likes/likes.module';
 import { MusicsModule } from './musics/musics.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(dataSourceOptions),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     UsersModule,
     AuthModule,
     VenueModule,

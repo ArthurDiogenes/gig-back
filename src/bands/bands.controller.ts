@@ -10,10 +10,13 @@ import {
   Query,
   ParseIntPipe,
   ParseUUIDPipe,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { BandsService } from './bands.service';
 import { CreateBandDto } from './dto/create-band.dto';
 import { UpdateBandDto } from './dto/update-band.dto';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 @Controller('bands')
 export class BandsController {
@@ -58,9 +61,29 @@ export class BandsController {
     return this.bandsService.findBandByUser(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBandDto: UpdateBandDto) {
-    return this.bandsService.update(+id, updateBandDto);
+  @Patch('user/:userId')
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'profilePicture', maxCount: 1 }, // Nome atualizado
+      { name: 'coverPicture', maxCount: 1 }, // Nome atualizado
+    ]),
+  )
+  update(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @Body() updateBandDto: UpdateBandDto,
+    @UploadedFiles()
+    files: {
+      profilePicture?: Express.Multer.File[];
+      coverPicture?: Express.Multer.File[];
+    },
+  ) {
+    const profilePicture = files?.profilePicture?.[0];
+    const coverPicture = files?.coverPicture?.[0];
+    console.log('Data:', updateBandDto);
+    return this.bandsService.updateByUserId(userId, updateBandDto, {
+      profilePicture,
+      coverPicture,
+    });
   }
 
   @Put(':id')
