@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class UpdateBandDto {
   @IsNotEmpty()
@@ -12,4 +12,16 @@ export class UpdateBandDto {
 
   @IsNotEmpty()
   description: string;
+
+  @IsOptional()
+  @IsString()
+  twitter?: string;
+
+  @IsOptional()
+  @IsString()
+  instagram?: string;
+
+  @IsOptional()
+  @IsString()
+  facebook?: string;
 }

@@ -37,6 +37,15 @@ export class Band {
   @Column({ type: 'int2', nullable: true })
   members: number;
 
+  @Column({type: 'varchar', length: 255, nullable: true})
+  twitter: string;
+
+  @Column({type: 'varchar', length: 255, nullable: true})
+  instagram: string;
+
+  @Column({type: 'varchar', length: 255, nullable: true})
+  facebook: string;
+
   @OneToMany(() => Contract, (contract) => contract.provider)
   receivedContracts: Contract[];
 

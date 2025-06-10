@@ -41,8 +41,14 @@ export class Venue {
   @Column({ nullable: true })
   profilePhoto: string;
 
-  @Column('simple-json', { nullable: true })
-  socialMedia?: { [key: string]: string }; // Ex: { instagram: 'url', facebook: 'url' }
+  @Column({type: 'varchar', length: 255, nullable: true})
+  twitter: string;
+
+  @Column({type: 'varchar', length: 255, nullable: true})
+  instagram: string;
+
+  @Column({type: 'varchar', length: 255, nullable: true})
+  facebook: string;
 
   @OneToMany(() => Contract, (contract) => contract.requester)
   requestedContracts: Contract[];
