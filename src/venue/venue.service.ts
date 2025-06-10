@@ -36,8 +36,38 @@ export class VenueService {
     }
   }
 
-  async findAll() {
-    return await this.venueRepository.find();
+  async findAll(page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+
+    const [results, total] = await this.venueRepository.findAndCount({
+      relations: ['user'],
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        city: true,
+        description: true,
+        address: true,
+        contact: true,
+        cep: true,
+        coverPhoto: true,
+        profilePhoto: true,
+        user: {
+          id: true,
+          role: true,
+        },
+      },
+      take: limit,
+      skip,
+      order: { name: 'ASC' },
+    });
+
+    return {
+      data: results,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+    };
   }
 
   async findOne(id: string) {
