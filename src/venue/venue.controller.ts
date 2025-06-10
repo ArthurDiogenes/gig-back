@@ -9,6 +9,7 @@ import {
   UseInterceptors,
   UploadedFiles,
   ParseUUIDPipe,
+  Query
 } from '@nestjs/common';
 import { VenueService } from './venue.service';
 import { CreateVenueDto } from './dto/create-venue.dto';
