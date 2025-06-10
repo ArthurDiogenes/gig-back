@@ -41,11 +41,26 @@ export class VenueService {
   }
 
   async findOne(id: string) {
-    return `This action returns a #${id} venue`;
+    const venue = await this.venueRepository.findOne({
+      where: { id },
+      relations: ['user'],
+      select: {
+        user: {
+          id: true,
+          role: true,
+        },
+      },
+    });
+
+    if (!venue) {
+      throw new BadRequestException('Estabelecimento não encontrado');
+    }
+
+    return venue;
   }
 
   async findVenueByUser(id: string) {
-    this.logger.log(id);
+    this.logger.log(`Finding venue by user ID: ${id}`);
     const venue = await this.venueRepository.findOne({
       where: { user: { id } },
       relations: ['user'],
@@ -65,7 +80,7 @@ export class VenueService {
   async update(
     id: string,
     updateVenueDto: UpdateVenueDto,
-    files: {
+    files?: {
       coverPhoto?: Express.Multer.File;
       profilePhoto?: Express.Multer.File;
     },
@@ -75,25 +90,55 @@ export class VenueService {
     });
 
     if (!venue) {
-      throw new Error('Venue not found');
+      throw new BadRequestException('Estabelecimento não encontrado');
     }
 
-    if (files.coverPhoto) {
+    // Handle file uploads if provided
+    if (files?.coverPhoto) {
       venue.coverPhoto = this.saveFile(files.coverPhoto);
     }
 
-    if (files.profilePhoto) {
+    if (files?.profilePhoto) {
       venue.profilePhoto = this.saveFile(files.profilePhoto);
     }
 
-    // Atualiza as outras propriedades
+    // Update other properties
     Object.assign(venue, updateVenueDto);
 
-    return this.venueRepository.save(venue);
+    try {
+      await this.venueRepository.save(venue);
+      return {
+        message: 'Estabelecimento atualizado com sucesso',
+        data: venue,
+      };
+    } catch (error) {
+      this.logger.error('Erro ao atualizar estabelecimento', error.stack);
+      throw new InternalServerErrorException(
+        'Erro ao atualizar estabelecimento',
+      );
+    }
   }
 
   async remove(id: string) {
-    return `This action removes a #${id} venue`;
+    const venue = await this.venueRepository.findOne({
+      where: { id },
+    });
+
+    if (!venue) {
+      throw new BadRequestException('Estabelecimento não encontrado');
+    }
+
+    try {
+      await this.venueRepository.remove(venue);
+      return {
+        message: 'Estabelecimento removido com sucesso',
+      };
+    } catch (error) {
+      this.logger.error('Erro ao remover estabelecimento', error.stack);
+      throw new InternalServerErrorException(
+        'Erro ao remover estabelecimento',
+      );
+    }
   }
 
   private saveFile(file: Express.Multer.File): string {
@@ -101,12 +146,13 @@ export class VenueService {
     const fileName = uuid.v4() + fileExtension;
     const filePath = path.join(__dirname, '../../uploads', fileName);
 
-    // Verifica se a pasta 'uploads' existe, se não, cria
-    if (!fs.existsSync(path.join(__dirname, '../../uploads'))) {
-      fs.mkdirSync(path.join(__dirname, '../../uploads'));
+    // Check if uploads directory exists, create if not
+    const uploadsDir = path.join(__dirname, '../../uploads');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
     }
 
-    // Salva o arquivo
+    // Save the file
     fs.writeFileSync(filePath, file.buffer);
 
     return fileName;
