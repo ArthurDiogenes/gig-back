@@ -50,8 +50,37 @@ export class BandsService {
     }
   }
 
-  async findAll() {
-    return await this.bandRepository.find();
+  async findAll(page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+
+    const [results, total] = await this.bandRepository.findAndCount({
+      relations: ['userId'],
+      select: {
+        id: true,
+        bandName: true,
+        city: true,
+        genre: true,
+        description: true,
+        contact: true,
+        members: true,
+        createdAt: true,
+        updatedAt: true,
+        userId: {
+          id: true,
+          role: true,
+        },
+      },
+      take: limit,
+      skip,
+      order: { bandName: 'ASC' },
+    });
+
+    return {
+      data: results,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit),
+    };
   }
 
   async findOne(id: number) {

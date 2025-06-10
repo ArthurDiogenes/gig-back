@@ -28,8 +28,11 @@ export class BandsController {
   }
 
   @Get()
-  findAll() {
-    return this.bandsService.findAll();
+  findAll(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+  ) {
+    return this.bandsService.findAll(+page, +limit);
   }
 
   @Get('featured')

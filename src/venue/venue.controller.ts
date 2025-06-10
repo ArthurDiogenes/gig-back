@@ -25,8 +25,11 @@ export class VenueController {
   }
 
   @Get()
-  findAll() {
-    return this.venueService.findAll();
+  findAll(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+  ) {
+    return this.venueService.findAll(+page, +limit);
   }
 
   @Get(':id')
