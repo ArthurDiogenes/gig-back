@@ -139,6 +139,7 @@ export class BandsService {
 
     return band;
   }
+
   async getFeaturedBands(limit: number) {
     const results = await this.reviewRepository
       .createQueryBuilder('review')

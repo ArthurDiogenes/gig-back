@@ -82,7 +82,6 @@ export class BandsController {
   ) {
     const profilePicture = files?.profilePicture?.[0];
     const coverPicture = files?.coverPicture?.[0];
-    console.log('Data:', updateBandDto);
     return this.bandsService.updateByUserId(userId, updateBandDto, {
       profilePicture,
       coverPicture,
