@@ -146,17 +146,45 @@ export class BandsService {
       .innerJoin('review.band', 'band')
       .innerJoin('band.userId', 'user')
       .select('band.id', 'bandId')
-      .addSelect('band.band_name', 'bandName')
+      .addSelect('band.bandName', 'bandName') // use o nome correto do campo na entidade (bandName)
       .addSelect('user.id', 'userId')
       .addSelect('AVG(review.rating)', 'averageRating')
       .groupBy('band.id')
-      .addGroupBy('band.band_name')
+      .addGroupBy('band.bandName')
       .addGroupBy('user.id')
       .orderBy('AVG(review.rating)', 'DESC')
       .limit(limit)
       .getRawMany();
 
-    return results;
+    if (results.length >= 2) {
+      return results;
+    }
+
+    const extraBandsNeeded = 2 - results.length;
+
+    const fallbackBands = await this.bandRepository
+      .createQueryBuilder('band')
+      .leftJoin('band.userId', 'user')
+      .select('band.id', 'bandId')
+      .addSelect('band.bandName', 'bandName')
+      .addSelect('user.id', 'userId')
+      .where((qb) => {
+        const subQuery = qb
+          .subQuery()
+          .select('DISTINCT review.band_id') // nome da coluna FK no banco (snake_case)
+          .from(Review, 'review')
+          .getQuery();
+        return `band.id NOT IN ${subQuery}`;
+      })
+      .limit(extraBandsNeeded)
+      .getRawMany();
+
+    const formattedFallback = fallbackBands.map((band) => ({
+      ...band,
+      averageRating: 0,
+    }));
+
+    return [...results, ...formattedFallback];
   }
 
   async search(name: string, page = 1, limit = 10) {
