@@ -85,28 +85,57 @@ export class PostsService {
     const skip = (page - 1) * limit;
     const take = limit;
     const order = orderBy === 'createdAt' ? 'DESC' : 'ASC';
+
     const [posts, total] = await this.postRepository.findAndCount({
       skip,
       take,
       order: { [orderBy]: order },
-      relations: ['user', 'likes'],
+      relations: ['user', 'user.band', 'user.venue', 'likes'],
     });
 
-    // Mapeia os posts para adicionar a signedUrl se houver imagem
     const postsWithSignedUrls = await Promise.all(
       posts.map(async (post) => {
+        // Signed URL da imagem do post
+        let imageUrl: string | null = null;
         if (post.imageFile) {
           const { data, error } = await this.supabase.storage
             .from('gig')
-            .createSignedUrl(post.imageFile, 60 * 60); // 1 hora
+            .createSignedUrl(post.imageFile, 60 * 60);
           this.logger.log('Signed URL gerada com sucesso');
-          delete post.imageFile;
           if (!error && data?.signedUrl) {
-            return { ...post, imageUrl: data.signedUrl };
+            imageUrl = data.signedUrl;
           }
         }
+
+        // Avatar do user (band ou venue)
+        let avatar: string | null = null;
+        if (post.user.band?.profilePicture) {
+          const { data, error } = await this.supabase.storage
+            .from('gig')
+            .createSignedUrl(post.user.band.profilePicture, 60 * 60);
+          if (!error && data?.signedUrl) {
+            avatar = data.signedUrl;
+          }
+        } else if (post.user.venue?.profilePhoto) {
+          const { data, error } = await this.supabase.storage
+            .from('gig')
+            .createSignedUrl(post.user.venue.profilePhoto, 60 * 60);
+          if (!error && data?.signedUrl) {
+            avatar = data.signedUrl;
+          }
+        }
+
+        // Limpa campos sensíveis (opcional)
         delete post.imageFile;
-        return { ...post, imageUrl: null };
+
+        return {
+          ...post,
+          imageUrl,
+          user: {
+            ...post.user,
+            avatar,
+          },
+        };
       }),
     );
 

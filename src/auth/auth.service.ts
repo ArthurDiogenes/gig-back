@@ -7,11 +7,12 @@ import { Response } from 'express';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TokenPayload } from './auth';
+import { SupabaseClient } from '@supabase/supabase-js';
 
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
-
+  private supabase: SupabaseClient;
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
@@ -19,6 +20,10 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {
     this.logger.log('AuthService initialized');
+    this.supabase = new SupabaseClient(
+      process.env.SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_KEY,
+    );
   }
 
   /**
@@ -81,8 +86,6 @@ export class AuthService {
       relations: ['likes', 'likes.post'],
     });
 
-    console.log(session);
-
     if (!session) {
       this.logger.error(`Session not found for user ID: ${user.sub.id}`);
       throw new UnauthorizedException('Session not found');
@@ -115,17 +118,43 @@ export class AuthService {
     // Validate user
     const user = await this.validateUser(body.email, body.password);
 
+    // Carrega relações band/venue se existirem
+    const fullUser = await this.userRepository.findOne({
+      where: { id: user.id },
+      relations: ['band', 'venue'],
+    });
+
+    // Descobre qual imagem usar como avatar
+    let avatar: string | null = null;
+
+    if (fullUser.band?.profilePicture) {
+      const { data, error } = await this.supabase.storage
+        .from('gig')
+        .createSignedUrl(fullUser.band.profilePicture, 60 * 60);
+      if (!error && data?.signedUrl) {
+        avatar = data.signedUrl;
+      }
+    } else if (fullUser.venue?.profilePhoto) {
+      const { data, error } = await this.supabase.storage
+        .from('gig')
+        .createSignedUrl(fullUser.venue.profilePhoto, 60 * 60);
+      if (!error && data?.signedUrl) {
+        avatar = data.signedUrl;
+      }
+    }
+
     // Generate token
     const token = await this.generateToken(user);
 
+    // Set cookie
     res.cookie('access_token', token.accessToken, {
-      httpOnly: true, // Prevents client-side JavaScript from accessing the cookie
-      secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-      maxAge: 8 * 60 * 60 * 1000, // 8 hours in milliseconds
-      sameSite: 'strict', // Helps prevent CSRF attacks
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 8 * 60 * 60 * 1000, // 8 hours
+      sameSite: 'strict',
     });
 
-    // Return the user and the access token
+    // Return response with avatar
     return res.status(200).json({
       message: 'User logged in successfully',
       user: {
@@ -133,6 +162,7 @@ export class AuthService {
         email: user.email,
         role: user.role,
         name: user.name,
+        avatar,
       },
       accessToken: token.accessToken,
     });

@@ -146,45 +146,71 @@ export class BandsService {
       .innerJoin('review.band', 'band')
       .innerJoin('band.userId', 'user')
       .select('band.id', 'bandId')
-      .addSelect('band.bandName', 'bandName') // use o nome correto do campo na entidade (bandName)
+      .addSelect('band.bandName', 'bandName')
       .addSelect('user.id', 'userId')
+      .addSelect('band.profilePicture', 'profilePicture')
       .addSelect('AVG(review.rating)', 'averageRating')
       .groupBy('band.id')
       .addGroupBy('band.bandName')
+      .addGroupBy('band.profilePicture')
       .addGroupBy('user.id')
       .orderBy('AVG(review.rating)', 'DESC')
       .limit(limit)
       .getRawMany();
 
-    if (results.length >= 2) {
-      return results;
+    let featuredBands = results;
+
+    if (results.length < 2) {
+      const extraBandsNeeded = 2 - results.length;
+
+      const fallbackBands = await this.bandRepository
+        .createQueryBuilder('band')
+        .leftJoin('band.userId', 'user')
+        .select('band.id', 'bandId')
+        .addSelect('band.bandName', 'bandName')
+        .addSelect('user.id', 'userId')
+        .addSelect('band.profilePicture', 'profilePicture')
+        .where((qb) => {
+          const subQuery = qb
+            .subQuery()
+            .select('DISTINCT review.band_id')
+            .from(Review, 'review')
+            .getQuery();
+          return `band.id NOT IN ${subQuery}`;
+        })
+        .limit(extraBandsNeeded)
+        .getRawMany();
+
+      const formattedFallback = fallbackBands.map((band) => ({
+        ...band,
+        averageRating: 0,
+      }));
+
+      featuredBands = [...results, ...formattedFallback];
     }
 
-    const extraBandsNeeded = 2 - results.length;
+    // Gerar signed URLs para profilePicture
+    const bandsWithProfilePictures = await Promise.all(
+      featuredBands.map(async (band) => {
+        let signedUrl: string | null = null;
+        if (band.profilePicture) {
+          const { data, error } = await this.supabase.storage
+            .from('gig') // bucket onde está armazenada a imagem
+            .createSignedUrl(band.profilePicture, 60 * 60); // 1 hora
 
-    const fallbackBands = await this.bandRepository
-      .createQueryBuilder('band')
-      .leftJoin('band.userId', 'user')
-      .select('band.id', 'bandId')
-      .addSelect('band.bandName', 'bandName')
-      .addSelect('user.id', 'userId')
-      .where((qb) => {
-        const subQuery = qb
-          .subQuery()
-          .select('DISTINCT review.band_id') // nome da coluna FK no banco (snake_case)
-          .from(Review, 'review')
-          .getQuery();
-        return `band.id NOT IN ${subQuery}`;
-      })
-      .limit(extraBandsNeeded)
-      .getRawMany();
+          if (!error && data?.signedUrl) {
+            signedUrl = data.signedUrl;
+          }
+        }
 
-    const formattedFallback = fallbackBands.map((band) => ({
-      ...band,
-      averageRating: 0,
-    }));
+        return {
+          ...band,
+          profilePicture: signedUrl,
+        };
+      }),
+    );
 
-    return [...results, ...formattedFallback];
+    return bandsWithProfilePictures;
   }
 
   async search(name: string, page = 1, limit = 10) {
