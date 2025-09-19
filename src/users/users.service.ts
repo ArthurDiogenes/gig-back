@@ -1,4 +1,9 @@
-import { ConflictException, Injectable, Logger } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './users.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +11,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import * as bcryptjs from 'bcryptjs';
 import { VenueService } from 'src/venue/venue.service';
 import { BandsService } from 'src/bands/bands.service';
+
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
@@ -18,6 +24,21 @@ export class UsersService {
 
   async getUsers() {
     return this.userRepository.find();
+  }
+
+  async getMe(userId: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['band', 'venue'], // Inclui as relações de band e venue
+      select: ['id', 'email', 'role', 'name', 'createdAt', 'updatedAt'], // Seleciona apenas campos não sensíveis
+    });
+
+    if (!user) {
+      throw new NotFoundException('Usuário não encontrado');
+    }
+
+    delete user.password;
+    return user;
   }
 
   async getUserByEmail(email: string) {
