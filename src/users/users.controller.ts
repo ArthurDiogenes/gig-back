@@ -17,7 +17,7 @@ export class UsersController {
   @UseGuards(AuthGuard('jwt')) // Use o guarda de autenticação JWT ou outro que você tenha configurado
   async getMe(@Req() req: Request) {
     const user = req.user as any; // O objeto de usuário injetado pelo AuthGuard
-    return this.usersService.getMe(user.id);
+    return this.usersService.getMe(user.sub.id);
   }
 
   @Get('/email/:email')
