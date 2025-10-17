@@ -10,6 +10,8 @@ import {
   JoinColumn,
 } from 'typeorm';
 
+export type ContractStatus = 'pending' | 'confirmed' | 'declined' | 'canceled';
+
 @Entity({ name: 'contracts' })
 export class Contract {
   @PrimaryGeneratedColumn('uuid')
@@ -36,8 +38,12 @@ export class Contract {
   @Column({ type: 'text', nullable: true })
   additionalDetails?: string;
 
-  @Column({ type: 'boolean', default: null })
-  isConfirmed: boolean ;
+  @Column({
+    type: 'varchar',
+    enum: ['pending', 'confirmed', 'declined', 'canceled'],
+    default: 'pending',
+  })
+  status: ContractStatus;
 
   @ManyToOne(() => Venue)
   @JoinColumn({ name: 'requester_id' })

@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Contract } from './contract.entity';
 import { Band } from 'src/bands/band.entity';
 import { Venue } from 'src/venue/venue.entity';
+import { User } from 'src/users/users.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Contract, Venue, Band])],
+  imports: [TypeOrmModule.forFeature([Contract, Venue, Band, User])],
   controllers: [ContractController],
   providers: [ContractService],
 })
