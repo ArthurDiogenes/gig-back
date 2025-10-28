@@ -60,8 +60,8 @@ export class VenueController {
     },
   ) {
     return this.venueService.updateByUserId(userId, updateVenueDto, {
-      coverPhoto: files.coverPhoto ? files.coverPhoto[0] : null,
-      profilePhoto: files.profilePhoto ? files.profilePhoto[0] : null,
+      coverPhoto: files?.coverPhoto ? files.coverPhoto[0] : null,
+      profilePhoto: files?.profilePhoto ? files.profilePhoto[0] : null,
     });
   }
 
