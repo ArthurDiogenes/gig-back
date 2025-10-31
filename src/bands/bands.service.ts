@@ -253,9 +253,9 @@ export class BandsService {
     };
   }
 
-  async getReviewsByBandId(id: string) {
+  async getReviewsByBandId(id: number) {
     const band = await this.bandRepository.findOne({
-      where: { userId: { id: id } },
+      where: { id },
       relations: ['reviews'],
     });
     if (!band) {
