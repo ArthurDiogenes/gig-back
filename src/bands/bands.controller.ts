@@ -50,7 +50,7 @@ export class BandsController {
   }
 
   @Get(':id/reviews')
-  getReviewsByBandId(@Param('id', ParseUUIDPipe) id: string) {
+  getReviewsByBandId(@Param('id', ParseIntPipe) id: number) {
     return this.bandsService.getReviewsByBandId(id);
   }
 
