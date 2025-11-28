@@ -70,8 +70,42 @@ export class VenueService {
       order: { name: 'ASC' },
     });
 
+    const expiresIn = 60 * 60;
+
+    // Gerar signed URLs para profilePhoto e coverPhoto
+    const venuesWithSignedUrls = await Promise.all(
+      results.map(async (venue) => {
+        let profilePhotoUrl: string | null = null;
+        let coverPhotoUrl: string | null = null;
+
+        if (venue.profilePhoto) {
+          const { data, error } = await this.supabase.storage
+            .from('gig')
+            .createSignedUrl(venue.profilePhoto, expiresIn);
+          if (!error && data?.signedUrl) {
+            profilePhotoUrl = data.signedUrl;
+          }
+        }
+
+        if (venue.coverPhoto) {
+          const { data, error } = await this.supabase.storage
+            .from('gig')
+            .createSignedUrl(venue.coverPhoto, expiresIn);
+          if (!error && data?.signedUrl) {
+            coverPhotoUrl = data.signedUrl;
+          }
+        }
+
+        return {
+          ...venue,
+          profilePhoto: profilePhotoUrl,
+          coverPhoto: coverPhotoUrl,
+        };
+      }),
+    );
+
     return {
-      data: results,
+      data: venuesWithSignedUrls,
       total,
       page,
       lastPage: Math.ceil(total / limit),
@@ -92,6 +126,26 @@ export class VenueService {
 
     if (!venue) {
       throw new BadRequestException('Estabelecimento não encontrado');
+    }
+
+    const expiresIn = 60 * 60;
+
+    if (venue.profilePhoto) {
+      const { data, error } = await this.supabase.storage
+        .from('gig')
+        .createSignedUrl(venue.profilePhoto, expiresIn);
+      if (!error && data?.signedUrl) {
+        venue.profilePhoto = data.signedUrl;
+      }
+    }
+
+    if (venue.coverPhoto) {
+      const { data, error } = await this.supabase.storage
+        .from('gig')
+        .createSignedUrl(venue.coverPhoto, expiresIn);
+      if (!error && data?.signedUrl) {
+        venue.coverPhoto = data.signedUrl;
+      }
     }
 
     return venue;

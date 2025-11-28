@@ -63,6 +63,8 @@ export class BandsService {
         description: true,
         contact: true,
         members: true,
+        profilePicture: true,
+        coverPicture: true,
         createdAt: true,
         updatedAt: true,
         userId: {
@@ -75,8 +77,42 @@ export class BandsService {
       order: { bandName: 'ASC' },
     });
 
+    const expiresIn = 60 * 60;
+
+    // Gerar signed URLs para profilePicture e coverPicture
+    const bandsWithSignedUrls = await Promise.all(
+      results.map(async (band) => {
+        let profilePictureUrl: string | null = null;
+        let coverPictureUrl: string | null = null;
+
+        if (band.profilePicture) {
+          const { data, error } = await this.supabase.storage
+            .from('gig')
+            .createSignedUrl(band.profilePicture, expiresIn);
+          if (!error && data?.signedUrl) {
+            profilePictureUrl = data.signedUrl;
+          }
+        }
+
+        if (band.coverPicture) {
+          const { data, error } = await this.supabase.storage
+            .from('gig')
+            .createSignedUrl(band.coverPicture, expiresIn);
+          if (!error && data?.signedUrl) {
+            coverPictureUrl = data.signedUrl;
+          }
+        }
+
+        return {
+          ...band,
+          profilePicture: profilePictureUrl,
+          coverPicture: coverPictureUrl,
+        };
+      }),
+    );
+
     return {
-      data: results,
+      data: bandsWithSignedUrls,
       total,
       page,
       lastPage: Math.ceil(total / limit),
@@ -97,6 +133,27 @@ export class BandsService {
     if (!band) {
       throw new BadRequestException('Banda não encontrada');
     }
+
+    const expiresIn = 60 * 60;
+
+    if (band.profilePicture) {
+      const { data, error } = await this.supabase.storage
+        .from('gig')
+        .createSignedUrl(band.profilePicture, expiresIn);
+      if (!error && data?.signedUrl) {
+        band.profilePicture = data.signedUrl;
+      }
+    }
+
+    if (band.coverPicture) {
+      const { data, error } = await this.supabase.storage
+        .from('gig')
+        .createSignedUrl(band.coverPicture, expiresIn);
+      if (!error && data?.signedUrl) {
+        band.coverPicture = data.signedUrl;
+      }
+    }
+
     return band;
   }
 
@@ -233,6 +290,8 @@ export class BandsService {
         description: true,
         contact: true,
         members: true,
+        profilePicture: true,
+        coverPicture: true,
         createdAt: true,
         updatedAt: true,
         userId: {
@@ -245,8 +304,42 @@ export class BandsService {
       order: { bandName: 'ASC' },
     });
 
+    const expiresIn = 60 * 60;
+
+    // Gerar signed URLs para profilePicture e coverPicture
+    const bandsWithSignedUrls = await Promise.all(
+      results.map(async (band) => {
+        let profilePictureUrl: string | null = null;
+        let coverPictureUrl: string | null = null;
+
+        if (band.profilePicture) {
+          const { data, error } = await this.supabase.storage
+            .from('gig')
+            .createSignedUrl(band.profilePicture, expiresIn);
+          if (!error && data?.signedUrl) {
+            profilePictureUrl = data.signedUrl;
+          }
+        }
+
+        if (band.coverPicture) {
+          const { data, error } = await this.supabase.storage
+            .from('gig')
+            .createSignedUrl(band.coverPicture, expiresIn);
+          if (!error && data?.signedUrl) {
+            coverPictureUrl = data.signedUrl;
+          }
+        }
+
+        return {
+          ...band,
+          profilePicture: profilePictureUrl,
+          coverPicture: coverPictureUrl,
+        };
+      }),
+    );
+
     return {
-      data: results,
+      data: bandsWithSignedUrls,
       total,
       page,
       lastPage: Math.ceil(total / limit),
